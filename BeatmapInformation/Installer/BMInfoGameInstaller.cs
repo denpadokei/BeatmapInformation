@@ -1,5 +1,4 @@
-﻿using BeatmapInformation.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,8 +13,7 @@ namespace BeatmapInformation.Installer
     {
         public override void InstallBindings()
         {
-            this.Container.BindInterfacesAndSelfTo<BeatmapInformationViewController>().FromNewComponentAsViewController().AsCached();
-            this.Container.BindInterfacesAndSelfTo<BeatmapInformationController>().FromNewComponentOnNewGameObject(nameof(BeatmapInformationController)).AsCached().NonLazy();
+            this.Container.BindInterfacesAndSelfTo<BeatmapInformationViewController>().FromNewComponentAsViewController().AsSingle().NonLazy();
         }
     }
 }

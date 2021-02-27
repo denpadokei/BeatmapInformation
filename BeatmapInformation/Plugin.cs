@@ -1,6 +1,8 @@
-﻿using IPA;
+﻿using BeatmapInformation.Installer;
+using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
+using SiraUtil.Zenject;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +13,7 @@ using IPALogger = IPA.Logging.Logger;
 
 namespace BeatmapInformation
 {
-    [Plugin(RuntimeOptions.SingleStartInit)]
+    [Plugin(RuntimeOptions.DynamicInit)]
     public class Plugin
     {
         internal static Plugin Instance { get; private set; }
@@ -23,26 +25,15 @@ namespace BeatmapInformation
         /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
         /// Only use [Init] with one Constructor.
         /// </summary>
-        public void Init(IPALogger logger, Config conf)
+        public void Init(IPALogger logger, Config conf, Zenjector zenjector)
         {
             Instance = this;
             Log = logger;
             Log.Info("BeatmapInformation initialized.");
             Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
             Log.Debug("Config loaded");
+            zenjector.OnGame<BMInfoGameInstaller>().OnlyForStandard();
         }
-
-        #region BSIPA Config
-        //Uncomment to use BSIPA's config
-        /*
-        [Init]
-        public void InitWithConfig(Config conf)
-        {
-            Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
-            Log.Debug("Config loaded");
-        }
-        */
-        #endregion
 
         [OnStart]
         public void OnApplicationStart()
