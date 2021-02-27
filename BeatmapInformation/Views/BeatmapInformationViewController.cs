@@ -43,7 +43,7 @@ namespace BeatmapInformation.Views
         /// <summary>曲のサブタイトル を取得、設定</summary>
         public string SongSubName
         {
-            get => this.songSubName_ ?? "Unknown";
+            get => this.songSubName_ ?? "";
 
             set => this.SetProperty(ref this.songSubName_, value);
         }
@@ -87,7 +87,7 @@ namespace BeatmapInformation.Views
         /// <summary>ランク を取得、設定</summary>
         public string Rank
         {
-            get => this.rank_ ?? "E";
+            get => this.rank_ ?? "SS";
 
             set => this.SetProperty(ref this.rank_, value);
         }
@@ -98,7 +98,7 @@ namespace BeatmapInformation.Views
         /// <summary>精度 を取得、設定</summary>
         public string Seido
         {
-            get => this.seido_;
+            get => this.seido_ ?? "";
 
             set => this.SetProperty(ref this.seido_, value);
         }
@@ -244,15 +244,15 @@ namespace BeatmapInformation.Views
             if (!PluginConfig.Instance.Enable) {
                 return;
             }
-            this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
-            this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
-            this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
             var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
             var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
             if (previewBeatmapLevel == null) {
                 Logger.Debug("previewmap is null!");
                 return;
             }
+            this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
+            this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
+            this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
             this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
             HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
             this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), false, new Vector3(0f, 0.7f, -1.1f), Quaternion.Euler(0, 0, 0));
