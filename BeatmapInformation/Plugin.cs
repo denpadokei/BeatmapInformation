@@ -33,6 +33,7 @@ namespace BeatmapInformation
             Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
             Log.Debug("Config loaded");
             zenjector.OnGame<BMInfoGameInstaller>().OnlyForStandard();
+            zenjector.OnMenu<BMInfoMenuInstaller>();
         }
 
         [OnStart]

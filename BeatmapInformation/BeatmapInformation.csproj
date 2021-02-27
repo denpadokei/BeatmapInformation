@@ -133,11 +133,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Installer\BMInfoGameInstaller.cs" />
+    <Compile Include="Installer\BMInfoMenuInstaller.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Views\BeatmapInformationViewController.cs" />
+    <Compile Include="Views\SettingTabViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
@@ -148,6 +150,9 @@
     <None Include="BeatmapInformation.csproj.user" Condition="Exists('BeatmapInformation.csproj.user')" />
     <EmbeddedResource Include="Views\BeatmapInformationViewController.bsml">
       <DependentUpon>BeatmapInformationViewController.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Views\SettingTabViewController.bsml">
+      <DependentUpon>SettingTabViewController.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

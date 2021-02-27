@@ -7,6 +7,8 @@ namespace BeatmapInformation.Configuration
     internal class PluginConfig
     {
         public static PluginConfig Instance { get; set; }
+        public virtual bool Enable { get; set; } = true;
+
         /// <summary>
         /// This is called whenever BSIPA reads the config from disk (including when file changes are detected).
         /// </summary>
@@ -29,6 +31,7 @@ namespace BeatmapInformation.Configuration
         public virtual void CopyFrom(PluginConfig other)
         {
             // This instance's members populated from other
+            this.Enable = other.Enable;
         }
     }
 }

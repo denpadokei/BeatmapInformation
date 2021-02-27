@@ -1,4 +1,5 @@
-﻿using BeatSaberMarkupLanguage;
+﻿using BeatmapInformation.Configuration;
+using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.FloatingScreen;
@@ -118,7 +119,9 @@ namespace BeatmapInformation.Views
             this._scoreController.scoreDidChangeEvent -= this.OnScoreDidChangeEvent;
             this._scoreController.comboDidChangeEvent -= this.OnComboDidChangeEvent;
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent -= this.OnRelativeScoreOrImmediateRankDidChangeEvent;
-            Destroy(this._informationScreen);
+            if (this._informationScreen != null) {
+                Destroy(this._informationScreen);
+            }
             base.OnDestroy();
         }
         #endregion
@@ -238,6 +241,9 @@ namespace BeatmapInformation.Views
             this._scoreController = scoreController;
             this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
             this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
+            if (!PluginConfig.Instance.Enable) {
+                return;
+            }
             this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
             this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
