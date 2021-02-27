@@ -1,15 +1,16 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <horizontal horizontal-fit='MinSize' vertical-fit='PreferredSize' child-align='MiddleLeft' child-control-width='false'>
-    <vertical preferred-width='50' pad='5' min-width='50'>
-      <image id='cover' preserve-aspect='true'></image>
-    </vertical>
-    <vertical preferred-height='80' preferred-width='80' min-width='120' horizontal-fit='PreferredSize' vertical-fit='Unconstrained' pad='5'>
-      <text text='~song-name' font-size='10' size-delta-x='120'></text>
+  <horizontal horizontal-fit='Unconstrained' vertical-fit='PreferredSize' child-align='MiddleLeft'>
+    <image id='cover' preserve-aspect='true' min-width='50' min-height='50' preferred-height='80' pref-height='80'></image>
+    <vertical preferred-height='80' preferred-width='150' pad-left='3'>
+      <text text='~song-name' font-size='13' overflow-mode='Ellipsis' word-wrapping='false'></text>
       <vertical horizontal-fit='Unconstrained' spacing='-2'>
-        <text text='~song-sub-name' font-size='5'></text>
-        <text text='~song-author' font-size='5' color='grey'></text>
+        <text text='~song-sub-name' font-size='5' overflow-mode='Ellipsis' word-wrapping='false'></text>
+        <text text='~song-author' font-size='5' color='grey' overflow-mode='Ellipsis' word-wrapping='false'></text>
       </vertical>
-      <text text='~score' font-size='12' pivot-x='0'></text>
+      <vertical horizontal-fit='Unconstrained' spacing='-5'>
+        <text text='~combo' font-size='7'></text>
+        <text text='~score' font-size='12' pivot-x='0'></text>
+      </vertical>
       <vertical child-align='MiddleLeft' horizontal-fit='Unconstrained' spacing='-5'>
         <text text='~seido' font-size='10'></text>
         <text text='~rank' font-size='10'></text>

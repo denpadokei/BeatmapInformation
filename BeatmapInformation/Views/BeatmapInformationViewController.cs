@@ -53,9 +53,20 @@ namespace BeatmapInformation.Views
         /// <summary>曲作者 を取得、設定</summary>
         public string SongAuthor
         {
-            get => this.songAuthor_;
+            get => this.songAuthor_ ?? "";
 
             set => this.SetProperty(ref this.songAuthor_, value);
+        }
+
+        /// <summary>コンボ を取得、設定</summary>
+        private string combo_;
+        [UIValue("combo")]
+        /// <summary>コンボ を取得、設定</summary>
+        public string Combo
+        {
+            get => this.combo_ ?? "";
+
+            set => this.SetProperty(ref this.combo_, value);
         }
 
         /// <summary>スコア を取得、設定</summary>
@@ -93,23 +104,21 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // Unity Message
-        private void Awake()
-        {
-            Logger.Debug("Awake call");
-        }
-
+#if DEBUG
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.P)) {
                 HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
             }
         }
-
+#endif
         protected override void OnDestroy()
         {
             Logger.Debug("OnDestroy call");
             this._scoreController.scoreDidChangeEvent -= this.OnScoreDidChangeEvent;
+            this._scoreController.comboDidChangeEvent -= this.OnComboDidChangeEvent;
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent -= this.OnRelativeScoreOrImmediateRankDidChangeEvent;
+            Destroy(this._informationScreen);
             base.OnDestroy();
         }
         #endregion
@@ -121,29 +130,64 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プライベートメソッド
+        /// <summary>
+        /// スコアが更新されたときに呼び出されます。
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
         private void OnScoreDidChangeEvent(int arg1, int arg2)
         {
             this._currentScore = arg2;
-            this.Score = $"{this._currentScore}";
+            this.Score = $"{this._currentScore:#,0}";
         }
-
+        /// <summary>
+        /// コンボ数が変化したときに呼び出されます。
+        /// </summary>
+        /// <param name="obj"></param>
+        private void OnComboDidChangeEvent(int obj)
+        {
+            this.UpdateComboText(obj);
+        }
+        /// <summary>
+        /// 精度が変わったときに呼び出されます。
+        /// </summary>
+        private void OnRelativeScoreOrImmediateRankDidChangeEvent()
+        {
+            this.UpdateSeidoText();
+            this.UpdateRankText();
+        }
+        /// <summary>
+        /// ランク表示を更新します。
+        /// </summary>
         private void UpdateRankText()
         {
             this.Rank = RankModel.GetRankName(this._relativeScoreAndImmediateRankCounter.immediateRank);
         }
-
+        /// <summary>
+        /// 精度を更新します。
+        /// </summary>
         private void UpdateSeidoText()
         {
             this.Seido = $"{this._relativeScoreAndImmediateRankCounter.relativeScore * 100:0.00} %";
         }
-
+        /// <summary>
+        /// コンボ数を更新します。
+        /// </summary>
+        /// <param name="combo"></param>
+        private void UpdateComboText(int combo)
+        {
+            this.Combo = $"{combo} <size=50%>COMBO</size>";
+        }
+        /// <summary>
+        /// カバー画像を更新します。
+        /// </summary>
+        /// <param name="beatmapCover"></param>
+        /// <returns></returns>
         private IEnumerator SetCover(Sprite beatmapCover)
         {
             yield return new WaitWhile(() => this._cover == null || !this._cover);
             this._cover.sprite = beatmapCover;
-            //this._cover.rectTransform.sizeDelta = new Vector2(250f, 250f);
         }
-
         /// <summary>
         /// プロパティへ値をセットし、Viewへ通知します
         /// </summary>
@@ -195,6 +239,7 @@ namespace BeatmapInformation.Views
             this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
             this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
             this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
+            this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
             var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
             var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
@@ -204,19 +249,14 @@ namespace BeatmapInformation.Views
             }
             this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
             HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
-            this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), false, new Vector3(0f, 0.7f, -1.0f), Quaternion.Euler(0, 0, 0));
+            this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), false, new Vector3(0f, 0.7f, -1.1f), Quaternion.Euler(0, 0, 0));
             this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
             this._informationScreen.transform.SetParent(this.transform);
             this._informationScreen.GetComponent<Canvas>().sortingOrder = 30;
             this.SongName = previewBeatmapLevel.songName;
             this.SongSubName = previewBeatmapLevel.songSubName;
             this.SongAuthor = previewBeatmapLevel.songAuthorName;
-        }
-
-        private void OnRelativeScoreOrImmediateRankDidChangeEvent()
-        {
-            this.UpdateSeidoText();
-            this.UpdateRankText();
+            this.UpdateComboText(0);
         }
         #endregion
     }
