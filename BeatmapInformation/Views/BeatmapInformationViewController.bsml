@@ -1,19 +1,22 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <horizontal horizontal-fit='Unconstrained' vertical-fit='PreferredSize' child-align='MiddleLeft'>
-    <image id='cover' preserve-aspect='true' min-width='50' min-height='50' preferred-height='80' pref-height='80'></image>
-    <vertical preferred-height='80' preferred-width='150' pad-left='3'>
-      <text text='~song-name' font-size='13' overflow-mode='Ellipsis' word-wrapping='false'></text>
-      <vertical horizontal-fit='Unconstrained' spacing='-2'>
-        <text text='~song-sub-name' font-size='5' overflow-mode='Ellipsis' word-wrapping='false'></text>
-        <text text='~song-author' font-size='5' color='grey' overflow-mode='Ellipsis' word-wrapping='false'></text>
+  <horizontal horizontal-fit='PreferredSize' vertical-fit='PreferredSize' child-align='LowerLeft'>
+    <image id='cover' preserve-aspect='true' preferred-width='~cover-size' pivot-y='~cover-pivot' active='~cover-visible'></image>
+    <vertical pad-bottom='10' pad-top='10' pad-left='3' preferred-width='150' pivot-y='0'>
+      <text text='~song-name' font-size='~song-name-fontsize' overflow-mode='Ellipsis' word-wrapping='false'></text>
+      <vertical horizontal-fit='Unconstrained' spacing='~sub-text-spacing'>
+        <text text='~song-sub-name' font-size='~song-sub-name-fontsize' overflow-mode='Ellipsis' word-wrapping='false'></text>
+        <text text='~song-author' font-size='~song-author-fontsize' color='grey' overflow-mode='Ellipsis' word-wrapping='false'></text>
+        <vertical bg-color='white' background='panel-top' horizontal-fit='PreferredSize' pad-left='2' pad-right='2' spacing='3' child-align='MiddleLeft' pivot-x ='0' active='~difficulity-label-visible'>
+          <text text='~difficulity' font-size='~difficulity-fontsize' overflow-mode='Ellipsis' word-wrapping='false' color='black'></text>
+        </vertical>
       </vertical>
-      <vertical horizontal-fit='Unconstrained' spacing='-5'>
-        <text text='~combo' font-size='7'></text>
-        <text text='~score' font-size='12' pivot-x='0'></text>
+      <vertical horizontal-fit='Unconstrained' spacing='~score-text-spacing'>
+        <text text='~combo' font-size='~combo-fontsize' active='~combo-visible'></text>
+        <text text='~score' font-size='~score-fontsize' active='~score-visible'></text>
       </vertical>
-      <vertical child-align='MiddleLeft' horizontal-fit='Unconstrained' spacing='-5'>
-        <text text='~seido' font-size='10'></text>
-        <text text='~rank' font-size='10'></text>
+      <vertical horizontal-fit='Unconstrained' spacing='~rank-text-spacing'>
+        <text text='~seido' font-size='~seido-fontsize' active='~seido-visible'></text>
+        <text text='~rank' font-size='~rank-fontsize' active='~rank-visible'></text>
       </vertical>
     </vertical>
   </horizontal>

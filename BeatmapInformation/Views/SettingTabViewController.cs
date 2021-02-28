@@ -32,5 +32,18 @@ namespace BeatmapInformation.Views
         {
             GameplaySetup.instance.AddTab("Beatmap Information", this.ResourceName, this);
         }
+
+        [UIAction("reset-position")]
+        private void ResetPositionAndRotation()
+        {
+            PluginConfig.Instance.ScreenPosX = 0f;
+            PluginConfig.Instance.ScreenPosY = 0.7f;
+            PluginConfig.Instance.ScreenPosZ = -1.1f;
+
+            PluginConfig.Instance.ScreenRotX = 0f;
+            PluginConfig.Instance.ScreenRotY = 0f;
+            PluginConfig.Instance.ScreenRotZ = 0f;
+            PluginConfig.Instance.ScreenRotW = 0f;
+        }
     }
 }

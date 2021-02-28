@@ -26,6 +26,39 @@ namespace BeatmapInformation.Views
         // For this method of setting the ResourceName, this class must be the first class in the file.
         //public string ResourceName => string.Join(".", GetType().Namespace, GetType().Name);
 
+        /// <summary>カバー画像の表示 を取得、設定</summary>
+        private bool coverVisible_;
+        [UIValue("cover-visible")]
+        /// <summary>カバー画像の表示 を取得、設定</summary>
+        public bool CoverVisible
+        {
+            get => this.coverVisible_;
+
+            set => this.SetProperty(ref this.coverVisible_, value);
+        }
+
+        /// <summary>カバー画像のサイズ を取得、設定</summary>
+        private float coverSize_;
+        [UIValue("cover-size")]
+        /// <summary>カバー画像のサイズ を取得、設定</summary>
+        public float CoverSize
+        {
+            get => this.coverSize_;
+
+            set => this.SetProperty(ref this.coverSize_, value);
+        }
+
+        /// <summary>カバー画像のピボット を取得、設定</summary>
+        private float coverPivot_;
+        [UIValue("cover-pivot")]
+        /// <summary>カバー画像のピボット を取得、設定</summary>
+        public float CoverPivot
+        {
+            get => this.coverPivot_;
+
+            set => this.SetProperty(ref this.coverPivot_, value);
+        }
+
         /// <summary>曲のタイトル を取得、設定</summary>
         private string songName_;
         [UIValue("song-name")]
@@ -35,6 +68,17 @@ namespace BeatmapInformation.Views
             get => this.songName_ ?? "SongName";
 
             set => this.SetProperty(ref this.songName_, value);
+        }
+
+        /// <summary>曲名のフォントサイズ を取得、設定</summary>
+        private int songNameFontSize_;
+        [UIValue("song-name-fontsize")]
+        /// <summary>曲名のフォントサイズ を取得、設定</summary>
+        public int SongNameFontSize
+        {
+            get => this.songNameFontSize_;
+
+            set => this.SetProperty(ref this.songNameFontSize_, value);
         }
 
         /// <summary>曲のサブタイトル を取得、設定</summary>
@@ -48,6 +92,17 @@ namespace BeatmapInformation.Views
             set => this.SetProperty(ref this.songSubName_, value);
         }
 
+        /// <summary>サブタイトルフォントサイズ を取得、設定</summary>
+        private int songSubNameFontSize_;
+        [UIValue("song-sub-name-fontsize")]
+        /// <summary>サブタイトルフォントサイズ を取得、設定</summary>
+        public int SongSUbNameFontSIze
+        {
+            get => this.songSubNameFontSize_;
+
+            set => this.SetProperty(ref this.songSubNameFontSize_, value);
+        }
+
         /// <summary>曲作者 を取得、設定</summary>
         private string songAuthor_;
         [UIValue("song-author")]
@@ -57,6 +112,61 @@ namespace BeatmapInformation.Views
             get => this.songAuthor_ ?? "";
 
             set => this.SetProperty(ref this.songAuthor_, value);
+        }
+
+        /// <summary>曲作者フォントサイズ を取得、設定</summary>
+        private int songAuthorFontsize_;
+        [UIValue("song-author-fontsize")]
+        /// <summary>曲作者フォントサイズ を取得、設定</summary>
+        public int SongAuthorFontsize
+        {
+            get => this.songAuthorFontsize_;
+
+            set => this.SetProperty(ref this.songAuthorFontsize_, value);
+        }
+
+        /// <summary>難易度の表示 を取得、設定</summary>
+        private bool difficulityLabelVisible_;
+        [UIValue("difficulity-label-visible")]
+        /// <summary>難易度の表示 を取得、設定</summary>
+        public bool DifficulityLabelVisible
+        {
+            get => this.difficulityLabelVisible_;
+
+            set => this.SetProperty(ref this.difficulityLabelVisible_, value);
+        }
+
+        /// <summary>難易度 を取得、設定</summary>
+        private string difficulity_;
+        [UIValue("difficulity")]
+        /// <summary>難易度 を取得、設定</summary>
+        public string Difficulity
+        {
+            get => this.difficulity_;
+
+            set => this.SetProperty(ref this.difficulity_, value);
+        }
+
+        /// <summary>難易度フォントサイズ を取得、設定</summary>
+        private int difficulityFontsize_;
+        [UIValue("difficulity-fontsize")]
+        /// <summary>難易度フォントサイズ を取得、設定</summary>
+        public int DifficulityFontSize
+        {
+            get => this.difficulityFontsize_;
+
+            set => this.SetProperty(ref this.difficulityFontsize_, value);
+        }
+
+        /// <summary>コンボ数の表示 を取得、設定</summary>
+        private bool comboVisible_;
+        [UIValue("combo-visible")]
+        /// <summary>コンボ数の表示 を取得、設定</summary>
+        public bool ComboVisible
+        {
+            get => this.comboVisible_;
+
+            set => this.SetProperty(ref this.comboVisible_, value);
         }
 
         /// <summary>コンボ を取得、設定</summary>
@@ -70,6 +180,28 @@ namespace BeatmapInformation.Views
             set => this.SetProperty(ref this.combo_, value);
         }
 
+        /// <summary>コンボ数フォントサイズ を取得、設定</summary>
+        private int comboFontSize_;
+        [UIValue("combo-fontsize")]
+        /// <summary>コンボ数フォントサイズ を取得、設定</summary>
+        public int ComboFontSize
+        {
+            get => this.comboFontSize_;
+
+            set => this.SetProperty(ref this.comboFontSize_, value);
+        }
+
+        /// <summary>スコア表示 を取得、設定</summary>
+        private bool scoreVisible_;
+        [UIValue("score-visible")]
+        /// <summary>スコア表示 を取得、設定</summary>
+        public bool ScoreVisible
+        {
+            get => this.scoreVisible_;
+
+            set => this.SetProperty(ref this.scoreVisible_, value);
+        }
+
         /// <summary>スコア を取得、設定</summary>
         private string score_;
         [UIValue("score")]
@@ -79,6 +211,28 @@ namespace BeatmapInformation.Views
             get => this.score_ ?? "0";
 
             set => this.SetProperty(ref this.score_, value);
+        }
+
+        /// <summary>スコアフォントサイズ を取得、設定</summary>
+        private int scoreFontsize_;
+        [UIValue("score-fontsize")]
+        /// <summary>スコアフォントサイズ を取得、設定</summary>
+        public int ScoreFontsize
+        {
+            get => this.scoreFontsize_;
+
+            set => this.SetProperty(ref this.scoreFontsize_, value);
+        }
+
+        /// <summary>ランク表示 を取得、設定</summary>
+        private bool rankVisible_;
+        [UIValue("rank-visible")]
+        /// <summary>ランク表示 を取得、設定</summary>
+        public bool RankVisible
+        {
+            get => this.rankVisible_;
+
+            set => this.SetProperty(ref this.rankVisible_, value);
         }
 
         /// <summary>ランク を取得、設定</summary>
@@ -92,6 +246,28 @@ namespace BeatmapInformation.Views
             set => this.SetProperty(ref this.rank_, value);
         }
 
+        /// <summary>ランクフォントサイズ を取得、設定</summary>
+        private int rankFontsize_;
+        [UIValue("rank-fontsize")]
+        /// <summary>ランクフォントサイズ を取得、設定</summary>
+        public int RankFontsize
+        {
+            get => this.rankFontsize_;
+
+            set => this.SetProperty(ref this.rankFontsize_, value);
+        }
+
+        /// <summary>精度の表示 を取得、設定</summary>
+        private bool seidoVisible_;
+        [UIValue("seido-visible")]
+        /// <summary>精度の表示 を取得、設定</summary>
+        public bool SeidoVisible
+        {
+            get => this.seidoVisible_;
+
+            set => this.SetProperty(ref this.seidoVisible_, value);
+        }
+
         /// <summary>精度 を取得、設定</summary>
         private string seido_;
         [UIValue("seido")]
@@ -101,6 +277,50 @@ namespace BeatmapInformation.Views
             get => this.seido_ ?? "";
 
             set => this.SetProperty(ref this.seido_, value);
+        }
+
+        /// <summary>精度フォントサイズ を取得、設定</summary>
+        private int seidoFontsize_;
+        [UIValue("seido-fontsize")]
+        /// <summary>精度フォントサイズ を取得、設定</summary>
+        public int SeidoFontsize
+        {
+            get => this.seidoFontsize_;
+
+            set => this.SetProperty(ref this.seidoFontsize_, value);
+        }
+
+        /// <summary>サブテキストのスペーシング を取得、設定</summary>
+        private float subTextSpacing_;
+        [UIValue("sub-text-spacing")]
+        /// <summary>サブテキストのスペーシング を取得、設定</summary>
+        public float SubTextSpacing
+        {
+            get => this.subTextSpacing_;
+
+            set => this.SetProperty(ref this.subTextSpacing_, value);
+        }
+
+        /// <summary>スコアテキストのスペーシング を取得、設定</summary>
+        private float scoreTextSpacing_;
+        [UIValue("score-text-spacing")]
+        /// <summary>スコアテキストのスペーシング を取得、設定</summary>
+        public float ScoreTextSpacing
+        {
+            get => this.scoreTextSpacing_;
+
+            set => this.SetProperty(ref this.scoreTextSpacing_, value);
+        }
+
+        /// <summary>ランクテキストのスペーシング を取得、設定</summary>
+        private float rankTextSpacing_;
+        [UIValue("rank-text-spacing")]
+        /// <summary>ランクテキストのスペーシング を取得、設定</summary>
+        public float RankTextSpacing
+        {
+            get => this.rankTextSpacing_;
+
+            set => this.SetProperty(ref this.rankTextSpacing_, value);
         }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
@@ -119,6 +339,10 @@ namespace BeatmapInformation.Views
             this._scoreController.scoreDidChangeEvent -= this.OnScoreDidChangeEvent;
             this._scoreController.comboDidChangeEvent -= this.OnComboDidChangeEvent;
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent -= this.OnRelativeScoreOrImmediateRankDidChangeEvent;
+            this._pauseController.didPauseEvent -= this.OnDidPauseEvent;
+            this._pauseController.didResumeEvent -= this.OnDidResumeEvent;
+            PluginConfig.Instance.OnReloaded -= this.OnReloaded;
+            PluginConfig.Instance.OnChenged -= this.OnChenged;
             if (this._informationScreen != null) {
                 Destroy(this._informationScreen);
             }
@@ -191,6 +415,75 @@ namespace BeatmapInformation.Views
             yield return new WaitWhile(() => this._cover == null || !this._cover);
             this._cover.sprite = beatmapCover;
         }
+
+        private void OnDidResumeEvent()
+        {
+            if (this._informationScreen == null) {
+                return;
+            }
+            this._informationScreen.ShowHandle = false;
+        }
+
+        private void OnDidPauseEvent()
+        {
+            if (this._informationScreen == null) {
+                return;
+            }
+            this._informationScreen.ShowHandle = true;
+        }
+
+        private void OnChenged(PluginConfig obj)
+        {
+            this.SetConfigValue(obj);
+        }
+
+        private void OnReloaded(PluginConfig obj)
+        {
+            this.SetConfigValue(obj);
+        }
+
+        private void SetConfigValue(PluginConfig p)
+        {
+            this.CoverVisible = p.CoverVisible;
+            this.CoverSize = p.CoverSize;
+            this.CoverPivot = p.CoverPivotPos;
+
+            this.SongNameFontSize = p.SongNameFontSize;
+            this.SongSUbNameFontSIze = p.SongSubNameFontSize;
+            this.SongAuthorFontsize = p.SongAuthorNameFontSize;
+
+            this.ScoreVisible = p.ScoreVisible;
+            this.ScoreFontsize = p.ScoreFontSize;
+
+            this.ComboFontSize = p.ComboFontSize;
+            this.ComboVisible = p.ComboVisible;
+
+            this.SeidoFontsize = p.SeidoFontSize;
+            this.SeidoVisible = p.SeidoVisible;
+
+            this.RankVisible = p.RankVisible;
+            this.RankFontsize = p.RankFontSize;
+
+            this.DifficulityLabelVisible = p.DifficulityLabelVisible;
+            this.DifficulityFontSize = p.DifficulityLabelFontSize;
+
+            this.SubTextSpacing = p.SubTextSpacing;
+            this.ScoreTextSpacing = p.ScoreTextSpacing;
+            this.RankTextSpacing = p.RankTextSpacing;
+        }
+
+        private void OnHandleReleased(object sender, FloatingScreenHandleEventArgs e)
+        {
+            PluginConfig.Instance.ScreenPosX = e.Position.x;
+            PluginConfig.Instance.ScreenPosY = e.Position.y;
+            PluginConfig.Instance.ScreenPosZ = e.Position.z;
+
+            PluginConfig.Instance.ScreenRotX = e.Rotation.x;
+            PluginConfig.Instance.ScreenRotY = e.Rotation.y;
+            PluginConfig.Instance.ScreenRotZ = e.Rotation.z;
+            PluginConfig.Instance.ScreenRotW = e.Rotation.w;
+        }
+
         /// <summary>
         /// プロパティへ値をセットし、Viewへ通知します
         /// </summary>
@@ -227,6 +520,7 @@ namespace BeatmapInformation.Views
         private GameplayCoreSceneSetupData _gameplayCoreSceneSetupData;
         private FloatingScreen _informationScreen;
         private RelativeScoreAndImmediateRankCounter _relativeScoreAndImmediateRankCounter;
+        private PauseController _pauseController;
         [UIComponent("cover")]
         private ImageView _cover;
         private Sprite _coverSprite;
@@ -235,12 +529,13 @@ namespace BeatmapInformation.Views
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
         [Inject]
-        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter)
+        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController)
         {
             Logger.Debug("Constractor call");
             this._scoreController = scoreController;
             this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
             this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
+            this._pauseController = pauseController;
             if (!PluginConfig.Instance.Enable) {
                 return;
             }
@@ -253,16 +548,23 @@ namespace BeatmapInformation.Views
             this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
             this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
+            this._pauseController.didPauseEvent += this.OnDidPauseEvent;
+            this._pauseController.didResumeEvent += this.OnDidResumeEvent;
             this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
             HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
-            this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), false, new Vector3(0f, 0.7f, -1.1f), Quaternion.Euler(0, 0, 0));
+            this.SetConfigValue(PluginConfig.Instance);
+            this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), false, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), new Quaternion(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ, PluginConfig.Instance.ScreenRotW));
             this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
-            this._informationScreen.transform.SetParent(this.transform);
+            this._informationScreen.transform.SetParent(this.gameObject.transform);
             this._informationScreen.GetComponent<Canvas>().sortingOrder = 30;
+            this._informationScreen.HandleReleased += this.OnHandleReleased;
             this.SongName = previewBeatmapLevel.songName;
             this.SongSubName = previewBeatmapLevel.songSubName;
             this.SongAuthor = previewBeatmapLevel.songAuthorName;
+            this.Difficulity = diff.difficulty.ToString();
             this.UpdateComboText(0);
+            PluginConfig.Instance.OnReloaded += this.OnReloaded;
+            PluginConfig.Instance.OnChenged += this.OnChenged;
         }
         #endregion
     }
