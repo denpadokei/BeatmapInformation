@@ -35,7 +35,6 @@ namespace BeatmapInformation.Configuration
         public virtual float ScreenRotX { get; set; } = 0;
         public virtual float ScreenRotY { get; set; } = 0;
         public virtual float ScreenRotZ { get; set; } = 0;
-        public virtual float ScreenRotW { get; set; } = 0;
 
         public event Action<PluginConfig> OnReloaded;
         public event Action<PluginConfig> OnChenged;
@@ -83,14 +82,12 @@ namespace BeatmapInformation.Configuration
             this.SubTextSpacing = other.SubTextSpacing;
             this.ScoreTextSpacing = other.ScoreTextSpacing;
             this.RankTextSpacing = other.RankTextSpacing;
-            //this.ScreenScale = other.ScreenScale;
             this.ScreenPosX = other.ScreenPosX;
             this.ScreenPosY = other.ScreenPosY;
             this.ScreenPosZ = other.ScreenPosZ;
             this.ScreenRotX = other.ScreenRotX;
             this.ScreenRotY = other.ScreenRotY;
             this.ScreenRotZ = other.ScreenRotZ;
-            this.ScreenRotW = other.ScreenRotW;
         }
     }
 }

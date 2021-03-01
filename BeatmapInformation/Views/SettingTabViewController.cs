@@ -43,7 +43,6 @@ namespace BeatmapInformation.Views
             PluginConfig.Instance.ScreenRotX = 0f;
             PluginConfig.Instance.ScreenRotY = 0f;
             PluginConfig.Instance.ScreenRotZ = 0f;
-            PluginConfig.Instance.ScreenRotW = 0f;
         }
     }
 }

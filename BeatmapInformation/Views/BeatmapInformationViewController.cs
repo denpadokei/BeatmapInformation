@@ -14,6 +14,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
+using VRUIControls;
 using Zenject;
 
 namespace BeatmapInformation.Views
@@ -325,14 +326,36 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // Unity Message
-#if DEBUG
+
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.P)) {
                 HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
             }
+            if (this._informationScreen == null || this._informationScreen.screenMover == null) {
+                return;
+            }
+            try {
+                this._informationScreen.screenMover.gameObject.SetActive(true);
+            }
+            catch (Exception e) {
+                Logger.Error(e);
+            }
         }
-#endif
+
+
+        private void Start()
+        {
+            this._informationScreen.ShowHandle = false;
+            if (this.pointer.gameObject.GetComponent<FloatingScreenMoverPointer>() == null) {
+                var mover = this.pointer.gameObject.AddComponent<FloatingScreenMoverPointer>();
+                Destroy(this._informationScreen.screenMover);
+                this._informationScreen.screenMover = mover;
+                this._informationScreen.screenMover.Init(this._informationScreen);
+                this.pointer.gameObject.SetActive(true);
+            }
+        }
+
         protected override void OnDestroy()
         {
             Logger.Debug("OnDestroy call");
@@ -416,6 +439,28 @@ namespace BeatmapInformation.Views
             this._cover.sprite = beatmapCover;
         }
 
+        private IEnumerator CanvasConfigUpdate()
+        {
+            yield return new WaitWhile(() => this._cover == null || !this._cover);
+            try {
+                var coreGameHUDController = Resources.FindObjectsOfTypeAll<CoreGameHUDController>().FirstOrDefault();
+                if (coreGameHUDController != null) {
+                    var energyGo = coreGameHUDController.GetField<GameObject, CoreGameHUDController>("_energyPanelGO");
+                    var energyCanvas = energyGo.GetComponent<Canvas>();
+                    foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
+                        canvas.overrideSorting = energyCanvas.overrideSorting;
+                        canvas.sortingLayerID = energyCanvas.sortingLayerID;
+                        canvas.sortingLayerName = energyCanvas.sortingLayerName;
+                        canvas.sortingOrder = energyCanvas.sortingOrder;
+                        canvas.gameObject.layer = energyCanvas.gameObject.layer;
+                    }
+                }
+            }
+            catch (Exception e) {
+                Logger.Error(e);
+            }
+        }
+
         private void OnDidResumeEvent()
         {
             if (this._informationScreen == null) {
@@ -430,6 +475,12 @@ namespace BeatmapInformation.Views
                 return;
             }
             this._informationScreen.ShowHandle = true;
+            try {
+                this._informationScreen.screenMover.gameObject.SetActive(true);
+            }
+            catch (Exception e) {
+                Logger.Error(e);
+            }
         }
 
         private void OnChenged(PluginConfig obj)
@@ -470,18 +521,31 @@ namespace BeatmapInformation.Views
             this.SubTextSpacing = p.SubTextSpacing;
             this.ScoreTextSpacing = p.ScoreTextSpacing;
             this.RankTextSpacing = p.RankTextSpacing;
+
+            if (this._informationScreen == null || !this._informationScreen) {
+                return;
+            }
+            this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
+            this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
         }
 
         private void OnHandleReleased(object sender, FloatingScreenHandleEventArgs e)
         {
+            Logger.Debug($"Handle Released");
             PluginConfig.Instance.ScreenPosX = e.Position.x;
             PluginConfig.Instance.ScreenPosY = e.Position.y;
             PluginConfig.Instance.ScreenPosZ = e.Position.z;
 
-            PluginConfig.Instance.ScreenRotX = e.Rotation.x;
-            PluginConfig.Instance.ScreenRotY = e.Rotation.y;
-            PluginConfig.Instance.ScreenRotZ = e.Rotation.z;
-            PluginConfig.Instance.ScreenRotW = e.Rotation.w;
+            var rot = e.Rotation.eulerAngles;
+
+            PluginConfig.Instance.ScreenRotX = rot.x;
+            PluginConfig.Instance.ScreenRotY = rot.y;
+            PluginConfig.Instance.ScreenRotZ = rot.z;
+        }
+
+        private void OnHandleGrabbed(object sender, FloatingScreenHandleEventArgs e)
+        {
+            Logger.Debug($"Handle Grabbed");
         }
 
         /// <summary>
@@ -523,19 +587,22 @@ namespace BeatmapInformation.Views
         private PauseController _pauseController;
         [UIComponent("cover")]
         private ImageView _cover;
+        private VRPointer pointer;
         private Sprite _coverSprite;
+        private VRPointer _vrPointer;
         private volatile int _currentScore;
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
         [Inject]
-        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController)
+        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule)
         {
             Logger.Debug("Constractor call");
             this._scoreController = scoreController;
             this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
             this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
             this._pauseController = pauseController;
+            this.pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
             if (!PluginConfig.Instance.Enable) {
                 return;
             }
@@ -551,13 +618,15 @@ namespace BeatmapInformation.Views
             this._pauseController.didPauseEvent += this.OnDidPauseEvent;
             this._pauseController.didResumeEvent += this.OnDidResumeEvent;
             this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
-            HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
+            
             this.SetConfigValue(PluginConfig.Instance);
-            this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), false, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), new Quaternion(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ, PluginConfig.Instance.ScreenRotW));
+            this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f));
             this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
-            this._informationScreen.transform.SetParent(this.gameObject.transform);
-            this._informationScreen.GetComponent<Canvas>().sortingOrder = 30;
+            this._informationScreen.transform.rotation = Quaternion.Euler(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ);
+            this._informationScreen.HandleGrabbed += this.OnHandleGrabbed;
             this._informationScreen.HandleReleased += this.OnHandleReleased;
+            HMMainThreadDispatcher.instance.Enqueue(this.CanvasConfigUpdate());
+            HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
             this.SongName = previewBeatmapLevel.songName;
             this.SongSubName = previewBeatmapLevel.songSubName;
             this.SongAuthor = previewBeatmapLevel.songAuthorName;
