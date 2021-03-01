@@ -326,33 +326,27 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // Unity Message
-
+#if DEBUG
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.P)) {
                 HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
             }
-            if (this._informationScreen == null || this._informationScreen.screenMover == null) {
-                return;
-            }
-            try {
-                this._informationScreen.screenMover.gameObject.SetActive(true);
-            }
-            catch (Exception e) {
-                Logger.Error(e);
-            }
         }
-
-
+#endif
         private void Start()
         {
+            if (this._informationScreen == null) {
+                return;
+            }
             this._informationScreen.ShowHandle = false;
-            if (this.pointer.gameObject.GetComponent<FloatingScreenMoverPointer>() == null) {
-                var mover = this.pointer.gameObject.AddComponent<FloatingScreenMoverPointer>();
+            // GameCore中のVRPointerはメニュー画面でのVRpointerと異なるのでもう一度セットしなおす必要がある。
+            if (this._pointer.gameObject.GetComponent<FloatingScreenMoverPointer>() == null) {
+                var mover = this._pointer.gameObject.AddComponent<FloatingScreenMoverPointer>();
                 Destroy(this._informationScreen.screenMover);
                 this._informationScreen.screenMover = mover;
                 this._informationScreen.screenMover.Init(this._informationScreen);
-                this.pointer.gameObject.SetActive(true);
+                this._pointer.gameObject.SetActive(true);
             }
         }
 
@@ -367,6 +361,8 @@ namespace BeatmapInformation.Views
             PluginConfig.Instance.OnReloaded -= this.OnReloaded;
             PluginConfig.Instance.OnChenged -= this.OnChenged;
             if (this._informationScreen != null) {
+                this._informationScreen.HandleGrabbed -= this.OnHandleGrabbed;
+                this._informationScreen.HandleReleased -= this.OnHandleReleased;
                 Destroy(this._informationScreen);
             }
             base.OnDestroy();
@@ -441,7 +437,7 @@ namespace BeatmapInformation.Views
 
         private IEnumerator CanvasConfigUpdate()
         {
-            yield return new WaitWhile(() => this._cover == null || !this._cover);
+            yield return new WaitWhile(() => this._informationScreen == null || !this._informationScreen);
             try {
                 var coreGameHUDController = Resources.FindObjectsOfTypeAll<CoreGameHUDController>().FirstOrDefault();
                 if (coreGameHUDController != null) {
@@ -475,12 +471,6 @@ namespace BeatmapInformation.Views
                 return;
             }
             this._informationScreen.ShowHandle = true;
-            try {
-                this._informationScreen.screenMover.gameObject.SetActive(true);
-            }
-            catch (Exception e) {
-                Logger.Error(e);
-            }
         }
 
         private void OnChenged(PluginConfig obj)
@@ -525,22 +515,26 @@ namespace BeatmapInformation.Views
             if (this._informationScreen == null || !this._informationScreen) {
                 return;
             }
-            this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
-            this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
+            lock (_lockObject) {
+                this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
+                this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
+            }
         }
 
         private void OnHandleReleased(object sender, FloatingScreenHandleEventArgs e)
         {
             Logger.Debug($"Handle Released");
-            PluginConfig.Instance.ScreenPosX = e.Position.x;
-            PluginConfig.Instance.ScreenPosY = e.Position.y;
-            PluginConfig.Instance.ScreenPosZ = e.Position.z;
+            lock (_lockObject) {
+                PluginConfig.Instance.ScreenPosX = e.Position.x;
+                PluginConfig.Instance.ScreenPosY = e.Position.y;
+                PluginConfig.Instance.ScreenPosZ = e.Position.z;
 
-            var rot = e.Rotation.eulerAngles;
+                var rot = e.Rotation.eulerAngles;
 
-            PluginConfig.Instance.ScreenRotX = rot.x;
-            PluginConfig.Instance.ScreenRotY = rot.y;
-            PluginConfig.Instance.ScreenRotZ = rot.z;
+                PluginConfig.Instance.ScreenRotX = rot.x;
+                PluginConfig.Instance.ScreenRotY = rot.y;
+                PluginConfig.Instance.ScreenRotZ = rot.z;
+            }
         }
 
         private void OnHandleGrabbed(object sender, FloatingScreenHandleEventArgs e)
@@ -587,10 +581,10 @@ namespace BeatmapInformation.Views
         private PauseController _pauseController;
         [UIComponent("cover")]
         private ImageView _cover;
-        private VRPointer pointer;
+        private VRPointer _pointer;
         private Sprite _coverSprite;
-        private VRPointer _vrPointer;
         private volatile int _currentScore;
+        private static readonly object _lockObject = new object();
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
@@ -602,7 +596,7 @@ namespace BeatmapInformation.Views
             this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
             this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
             this._pauseController = pauseController;
-            this.pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
+            this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
             if (!PluginConfig.Instance.Enable) {
                 return;
             }
