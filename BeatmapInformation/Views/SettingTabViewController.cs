@@ -22,6 +22,13 @@ namespace BeatmapInformation.Views
             set => PluginConfig.Instance.Enable = value;
         }
 
+        [UIValue("postion-lock")]
+        public bool PositionLovk
+        {
+            get => PluginConfig.Instance.LockPosition;
+            set => PluginConfig.Instance.LockPosition = value;
+        }
+
         protected override void OnDestroy()
         {
             GameplaySetup.instance.RemoveTab("Beatmap Information");

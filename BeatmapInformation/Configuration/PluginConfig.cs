@@ -9,6 +9,9 @@ namespace BeatmapInformation.Configuration
     {
         public static PluginConfig Instance { get; set; }
         public virtual bool Enable { get; set; } = true;
+        public virtual bool LockPosition { get; set; } = false;
+        public virtual bool ChangeScale { get; set; } = false;
+        public virtual float ScreenScale { get; set; } = 0.02f;
         public virtual bool CoverVisible { get; set; } = true;
         public virtual float CoverPivotPos { get; set; } = 0.75f;
         public virtual float CoverSize { get; set; } = 40f;
@@ -23,6 +26,7 @@ namespace BeatmapInformation.Configuration
         public virtual int SeidoFontSize { get; set; } = 10;
         public virtual bool RankVisible { get; set; } = true;
         public virtual int RankFontSize { get; set; } = 10;
+        public virtual float TextSpaceHeight { get; set; } = 105f;
         public virtual bool DifficulityLabelVisible { get; set; } = true;
         public virtual int DifficulityLabelFontSize { get; set; } = 5;
         public virtual float SubTextSpacing { get; set; } = -1;
@@ -63,9 +67,13 @@ namespace BeatmapInformation.Configuration
         {
             // This instance's members populated from other
             this.Enable = other.Enable;
+            this.LockPosition = other.LockPosition;
+            this.ChangeScale = other.ChangeScale;
+            this.ScreenScale = other.ScreenScale;
             this.CoverVisible = other.CoverVisible;
             this.CoverPivotPos = other.CoverPivotPos;
             this.CoverSize = other.CoverSize;
+            this.TextSpaceHeight = other.TextSpaceHeight;
             this.SongNameFontSize = other.SongNameFontSize;
             this.SongSubNameFontSize = other.SongSubNameFontSize;
             this.SongAuthorNameFontSize = other.SongAuthorNameFontSize;

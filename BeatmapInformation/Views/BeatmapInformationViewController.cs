@@ -60,6 +60,28 @@ namespace BeatmapInformation.Views
             set => this.SetProperty(ref this.coverPivot_, value);
         }
 
+        /// <summary>テキストスペースの高さ を取得、設定</summary>
+        private float textSpaceHeight_;
+        [UIValue("text-height")]
+        /// <summary>テキストスペースの高さ を取得、設定</summary>
+        public float TextSpaceHeight
+        {
+            get => this.textSpaceHeight_;
+
+            set => this.SetProperty(ref this.textSpaceHeight_, value);
+        }
+
+        /// <summary>テキストスペースの幅 を取得、設定</summary>
+        private float textSpaceWidth_;
+        [UIValue("text-witdh")]
+        /// <summary>テキストスペースの幅 を取得、設定</summary>
+        public float TextSpaceWidth
+        {
+            get => this.textSpaceWidth_;
+
+            set => this.SetProperty(ref this.textSpaceWidth_, value);
+        }
+
         /// <summary>曲のタイトル を取得、設定</summary>
         private string songName_;
         [UIValue("song-name")]
@@ -334,11 +356,12 @@ namespace BeatmapInformation.Views
             }
         }
 #endif
-        private void Start()
+        private IEnumerator Start()
         {
-            if (this._informationScreen == null) {
-                return;
+            if (!PluginConfig.Instance.Enable) {
+                yield break;
             }
+            yield return new WaitWhile(() => this._informationScreen == null || !this._informationScreen);
             this._informationScreen.ShowHandle = false;
 #if !DEBUG
             // GameCore中のVRPointerはメニュー画面でのVRpointerと異なるのでもう一度セットしなおす必要がある。
@@ -347,7 +370,7 @@ namespace BeatmapInformation.Views
                 Destroy(this._informationScreen.screenMover);
                 this._informationScreen.screenMover = mover;
                 this._informationScreen.screenMover.Init(this._informationScreen);
-                this._pointer.gameObject.SetActive(true);
+                this._informationScreen.screenMover.enabled = false;
             }
 #endif
         }
@@ -385,8 +408,7 @@ namespace BeatmapInformation.Views
         /// <param name="arg2"></param>
         private void OnScoreDidChangeEvent(int arg1, int arg2)
         {
-            this._currentScore = arg2;
-            this.Score = $"{this._currentScore:#,0}";
+            this.Score = $"{arg2:#,0}";
         }
         /// <summary>
         /// コンボ数が変化したときに呼び出されます。
@@ -465,14 +487,16 @@ namespace BeatmapInformation.Views
                 return;
             }
             this._informationScreen.ShowHandle = false;
+            this._informationScreen.screenMover.enabled = false;
         }
 
         private void OnDidPauseEvent()
         {
-            if (this._informationScreen == null) {
+            if (PluginConfig.Instance.LockPosition || this._informationScreen == null) {
                 return;
             }
             this._informationScreen.ShowHandle = true;
+            this._informationScreen.screenMover.enabled = true;
         }
 
         private void OnChenged(PluginConfig obj)
@@ -490,6 +514,9 @@ namespace BeatmapInformation.Views
             this.CoverVisible = p.CoverVisible;
             this.CoverSize = p.CoverSize;
             this.CoverPivot = p.CoverPivotPos;
+
+            this.TextSpaceHeight = p.TextSpaceHeight;
+            this.TextSpaceWidth = 200f - p.CoverSize;
 
             this.SongNameFontSize = p.SongNameFontSize;
             this.SongSUbNameFontSIze = p.SongSubNameFontSize;
@@ -520,6 +547,9 @@ namespace BeatmapInformation.Views
             lock (_lockObject) {
                 this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
                 this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
+                if (PluginConfig.Instance.ChangeScale) {
+                    this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
+                }
             }
         }
 
@@ -585,7 +615,6 @@ namespace BeatmapInformation.Views
         private ImageView _cover;
         private VRPointer _pointer;
         private Sprite _coverSprite;
-        private volatile int _currentScore;
         private static readonly object _lockObject = new object();
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
@@ -619,6 +648,9 @@ namespace BeatmapInformation.Views
             this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f));
             this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
             this._informationScreen.transform.rotation = Quaternion.Euler(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ);
+            if (PluginConfig.Instance.ChangeScale) {
+                this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
+            }
             this._informationScreen.HandleGrabbed += this.OnHandleGrabbed;
             this._informationScreen.HandleReleased += this.OnHandleReleased;
             HMMainThreadDispatcher.instance.Enqueue(this.CanvasConfigUpdate());
