@@ -340,6 +340,7 @@ namespace BeatmapInformation.Views
                 return;
             }
             this._informationScreen.ShowHandle = false;
+#if !DEBUG
             // GameCore中のVRPointerはメニュー画面でのVRpointerと異なるのでもう一度セットしなおす必要がある。
             if (this._pointer.gameObject.GetComponent<FloatingScreenMoverPointer>() == null) {
                 var mover = this._pointer.gameObject.AddComponent<FloatingScreenMoverPointer>();
@@ -348,6 +349,7 @@ namespace BeatmapInformation.Views
                 this._informationScreen.screenMover.Init(this._informationScreen);
                 this._pointer.gameObject.SetActive(true);
             }
+#endif
         }
 
         protected override void OnDestroy()
