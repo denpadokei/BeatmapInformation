@@ -367,15 +367,15 @@ namespace BeatmapInformation.Views
 #if !DEBUG
             // GameCore中のVRPointerはメニュー画面でのVRpointerと異なるのでもう一度セットしなおす必要がある。
             // その他のMODとの干渉も考える
-            var mover = this._pointer.gameObject.GetComponent<FloatingScreenMoverPointer>();
             if (this._informationScreen.screenMover?.gameObject.GetInstanceID() != this._pointer.gameObject.GetInstanceID()) {
+                var mover = this._pointer.gameObject.GetComponent<FloatingScreenMoverPointer>();
                 if (mover == null) {
                     mover = this._pointer.gameObject.AddComponent<FloatingScreenMoverPointer>();
                 }
                 Destroy(this._informationScreen.screenMover);
                 this._informationScreen.screenMover = mover;
+                this._informationScreen.screenMover.Init(this._informationScreen);
             }
-            this._informationScreen.screenMover.Init(this._informationScreen);
             this._informationScreen.screenMover.enabled = false;
 #endif
         }
