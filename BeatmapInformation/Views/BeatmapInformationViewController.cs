@@ -14,6 +14,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.UI;
 using VRUIControls;
 using Zenject;
 
@@ -369,9 +370,14 @@ namespace BeatmapInformation.Views
                 var mover = this._pointer.gameObject.AddComponent<FloatingScreenMoverPointer>();
                 Destroy(this._informationScreen.screenMover);
                 this._informationScreen.screenMover = mover;
-                this._informationScreen.screenMover.Init(this._informationScreen);
-                this._informationScreen.screenMover.enabled = false;
+                
             }
+            else {
+                var mover = this._pointer.gameObject.GetComponent<FloatingScreenMoverPointer>();
+                this._informationScreen.screenMover = mover;
+            }
+            this._informationScreen.screenMover.Init(this._informationScreen);
+            this._informationScreen.screenMover.enabled = false;
 #endif
         }
 
