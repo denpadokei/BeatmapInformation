@@ -374,6 +374,7 @@ namespace BeatmapInformation.Views
             }
             else {
                 var mover = this._pointer.gameObject.GetComponent<FloatingScreenMoverPointer>();
+                Destroy(this._informationScreen.screenMover);
                 this._informationScreen.screenMover = mover;
             }
             this._informationScreen.screenMover.Init(this._informationScreen);
