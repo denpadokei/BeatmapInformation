@@ -57,7 +57,6 @@ namespace BeatmapInformation.Configuration
         public virtual void Changed()
         {
             // Do stuff when the config is changed.
-            this.OnChenged?.Invoke(this);
         }
 
         /// <summary>
