@@ -1,20 +1,24 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <horizontal horizontal-fit='PreferredSize' vertical-fit='PreferredSize' child-align='LowerLeft'>
-    <image id='cover' preserve-aspect='true' preferred-width='~cover-size' pivot-y='~cover-pivot' active='~cover-visible'></image>
-    <vertical pad-bottom='10' pad-top='10' pad-left='3' preferred-width='~text-witdh' preferred-height='~text-height'>
-      <text text='~song-name' font-size='~song-name-fontsize' overflow-mode='Ellipsis' word-wrapping='false'></text>
-      <vertical horizontal-fit='Unconstrained' spacing='~sub-text-spacing'>
+  <horizontal horizontal-fit='PreferredSize' child-expand-height='false' child-control-height='true'>
+    <vertical child-expand-width='false'>
+      <image id='cover' preserve-aspect='true' preferred-width='~cover-size' pivot-y='~cover-pivot' active='~cover-visible'></image>
+    </vertical>
+    <vertical pad-bottom='10' pad-top='10' pad-left='3' preferred-width='~text-width' preferred-height='~text-height'>
+      <vertical vertical-fit='PreferredSize' pivot-x='0'>
+        <text text='~song-name' font-size='~song-name-fontsize' overflow-mode='Ellipsis' word-wrapping='false'></text>
+      </vertical>
+      <vertical horizontal-fit='Unconstrained' vertical-fit='PreferredSize' spacing='~sub-text-spacing' child-expand-height='false'>
         <text text='~song-sub-name' font-size='~song-sub-name-fontsize' overflow-mode='Ellipsis' word-wrapping='false'></text>
         <text text='~song-author' font-size='~song-author-fontsize' color='grey' overflow-mode='Ellipsis' word-wrapping='false'></text>
         <vertical bg-color='white' background='panel-top' horizontal-fit='PreferredSize' pad-left='2' pad-right='2' spacing='3' child-align='MiddleLeft' pivot-x ='0' active='~difficulity-label-visible' vertical-fit='PreferredSize'>
-          <text text='~difficulity' font-size='~difficulity-fontsize' overflow-mode='Ellipsis' word-wrapping='false' color='black'></text>
+          <text text='~difficulity' font-size='~difficulity-fontsize' overflow-mode='Ellipsis' word-wrapping='false' color='black' align='Midline'></text>
         </vertical>
       </vertical>
-      <vertical horizontal-fit='Unconstrained' spacing='~score-text-spacing'>
+      <vertical horizontal-fit='Unconstrained' vertical-fit='PreferredSize' spacing='~score-text-spacing'>
         <text text='~combo' font-size='~combo-fontsize' active='~combo-visible'></text>
         <text text='~score' font-size='~score-fontsize' active='~score-visible'></text>
       </vertical>
-      <vertical horizontal-fit='Unconstrained' spacing='~rank-text-spacing'>
+      <vertical horizontal-fit='Unconstrained' vertical-fit='PreferredSize' spacing='~rank-text-spacing'>
         <text text='~seido' font-size='~seido-fontsize' active='~seido-visible'></text>
         <text text='~rank' font-size='~rank-fontsize' active='~rank-visible'></text>
       </vertical>

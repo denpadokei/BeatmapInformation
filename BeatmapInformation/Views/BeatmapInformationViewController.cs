@@ -74,7 +74,7 @@ namespace BeatmapInformation.Views
 
         /// <summary>テキストスペースの幅 を取得、設定</summary>
         private float textSpaceWidth_;
-        [UIValue("text-witdh")]
+        [UIValue("text-width")]
         /// <summary>テキストスペースの幅 を取得、設定</summary>
         public float TextSpaceWidth
         {
@@ -628,45 +628,50 @@ namespace BeatmapInformation.Views
         private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule)
         {
             Logger.Debug("Constractor call");
-            this._scoreController = scoreController;
-            this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
-            this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
-            this._pauseController = pauseController;
-            this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
-            if (!PluginConfig.Instance.Enable) {
-                return;
+            try {
+                this._scoreController = scoreController;
+                this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
+                this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
+                this._pauseController = pauseController;
+                this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
+                if (!PluginConfig.Instance.Enable) {
+                    return;
+                }
+                var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
+                var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
+                if (previewBeatmapLevel == null) {
+                    Logger.Debug("previewmap is null!");
+                    return;
+                }
+                this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
+                this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
+                this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
+                this._pauseController.didPauseEvent += this.OnDidPauseEvent;
+                this._pauseController.didResumeEvent += this.OnDidResumeEvent;
+                this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
+
+                this.SetConfigValue(PluginConfig.Instance);
+                this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f));
+                this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
+                this._informationScreen.transform.rotation = Quaternion.Euler(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ);
+                if (PluginConfig.Instance.ChangeScale) {
+                    this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
+                }
+                this._informationScreen.HandleGrabbed += this.OnHandleGrabbed;
+                this._informationScreen.HandleReleased += this.OnHandleReleased;
+                HMMainThreadDispatcher.instance.Enqueue(this.CanvasConfigUpdate());
+                HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
+                this.SongName = previewBeatmapLevel.songName;
+                this.SongSubName = previewBeatmapLevel.songSubName;
+                this.SongAuthor = previewBeatmapLevel.songAuthorName;
+                this.Difficulity = diff.difficulty.ToString();
+                this.UpdateComboText(0);
+                PluginConfig.Instance.OnReloaded += this.OnReloaded;
+                PluginConfig.Instance.OnChenged += this.OnChenged;
             }
-            var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
-            var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
-            if (previewBeatmapLevel == null) {
-                Logger.Debug("previewmap is null!");
-                return;
+            catch (Exception e) {
+                Logger.Error(e);
             }
-            this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
-            this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
-            this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
-            this._pauseController.didPauseEvent += this.OnDidPauseEvent;
-            this._pauseController.didResumeEvent += this.OnDidResumeEvent;
-            this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
-            
-            this.SetConfigValue(PluginConfig.Instance);
-            this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f));
-            this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
-            this._informationScreen.transform.rotation = Quaternion.Euler(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ);
-            if (PluginConfig.Instance.ChangeScale) {
-                this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
-            }
-            this._informationScreen.HandleGrabbed += this.OnHandleGrabbed;
-            this._informationScreen.HandleReleased += this.OnHandleReleased;
-            HMMainThreadDispatcher.instance.Enqueue(this.CanvasConfigUpdate());
-            HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
-            this.SongName = previewBeatmapLevel.songName;
-            this.SongSubName = previewBeatmapLevel.songSubName;
-            this.SongAuthor = previewBeatmapLevel.songAuthorName;
-            this.Difficulity = diff.difficulty.ToString();
-            this.UpdateComboText(0);
-            PluginConfig.Instance.OnReloaded += this.OnReloaded;
-            PluginConfig.Instance.OnChenged += this.OnChenged;
         }
         #endregion
     }
