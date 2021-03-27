@@ -1,10 +1,10 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <horizontal horizontal-fit='PreferredSize' child-expand-height='false'>
-    <vertical child-expand-width='false'>
-      <horizontal pivot-y='~cover-pivot'>
+  <horizontal>
+    <vertical>
+      <horizontal pivot-y='~cover-pivot' preferred-height='~cover-size'>
         <image id='cover' preserve-aspect='true' preferred-width='~cover-size' active='~cover-visible'></image>
         <image id='songtime-ring' preserve-aspect='true' active='~songtime-visible' ignore-layout='true'>
-          <text id='songtime-text' font-size='~songtime-fontsize' active='~songtime-visible' align='Midline'></text>
+          <text text='~songtime-text' font-size='~songtime-fontsize' active='~songtime-visible' align='Midline'></text>
         </image>
       </horizontal>
     </vertical>
