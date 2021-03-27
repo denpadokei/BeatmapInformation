@@ -532,7 +532,7 @@ namespace BeatmapInformation.Views
             var time = this._audioTimeSyncController.songTime;
             if (time <= 0f) return;
             this.SongtimeText = $"{time.Minutes()}:{time.Seconds():00}";
-            this._songtimeRing.fillAmount = Mathf.Floor(time) / Mathf.Floor(this._audioTimeSyncController.songLength);
+            this._songtimeRing.fillAmount = Mathf.Floor(time) / this._songLength;
             this._songtimeRing.SetVerticesDirty();
         }
 
@@ -669,7 +669,7 @@ namespace BeatmapInformation.Views
         private readonly ImageView _songtimeRing;
         private VRPointer _pointer;
         private Sprite _coverSprite;
-        //private GameObject _timeCanvasGO;
+        private float _songLength;
         private static readonly object _lockObject = new object();
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
@@ -694,6 +694,7 @@ namespace BeatmapInformation.Views
                     Logger.Debug("previewmap is null!");
                     return;
                 }
+                this._songLength = Mathf.Floor(this._audioTimeSyncController.songLength);
                 this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
                 this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
                 this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
