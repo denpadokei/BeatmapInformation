@@ -60,6 +60,17 @@ namespace BeatmapInformation.Views
             set => this.SetProperty(ref this.coverPivot_, value);
         }
 
+        /// <summary>曲の時間テキスト を取得、設定</summary>
+        private string songtimeText_;
+        [UIValue("songtime-text")]
+        /// <summary>曲の時間テキスト を取得、設定</summary>
+        public string SongtimeText
+        {
+            get => this.songtimeText_;
+
+            set => this.SetProperty(ref this.songtimeText_, value);
+        }
+
         /// <summary>曲時間テキストのフォントサイズ を取得、設定</summary>
         private float songtimeTextFontSize_;
         [UIValue("songtime-fontsize")]
@@ -370,13 +381,16 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // Unity Message
-        private void Update() =>
+        private void Update()
+        {
 #if DEBUG
-            if (Input.GetKeyDown(KeyCode.P)) {
+            if (Input.GetKeyDown(KeyCode.Q)) {
                 HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
             }
 #endif
             this.UpdateSongTime();
+        }
+
 
         private IEnumerator Start()
         {
@@ -512,13 +526,13 @@ namespace BeatmapInformation.Views
             if (!PluginConfig.Instance.SongTimerVisible) {
                 return;
             }
-            if (this._songtimeRing == null || this._songtimeText == null) {
+            if (this._songtimeRing == null) {
                 return;
             }
             var time = this._audioTimeSyncController.songTime;
             if (time <= 0f) return;
-            this._songtimeText.text = $"{time.Minutes()}:{time.Seconds():00}";
-            this._songtimeRing.fillAmount = Mathf.Round(this._audioTimeSyncController.songTime / this._audioTimeSyncController.songLength * 100f) / 100f;
+            this.SongtimeText = $"{time.Minutes()}:{time.Seconds():00}";
+            this._songtimeRing.fillAmount = Mathf.Round(this._audioTimeSyncController.songTime) / this._audioTimeSyncController.songLength;
             this._songtimeRing.SetVerticesDirty();
         }
 
@@ -651,8 +665,6 @@ namespace BeatmapInformation.Views
         private PauseController _pauseController;
         [UIComponent("cover")]
         private readonly ImageView _cover;
-        [UIComponent("songtime-text")]
-        private readonly TextMeshProUGUI _songtimeText;
         [UIComponent("songtime-ring")]
         private readonly ImageView _songtimeRing;
         private VRPointer _pointer;
