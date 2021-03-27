@@ -532,7 +532,7 @@ namespace BeatmapInformation.Views
             var time = this._audioTimeSyncController.songTime;
             if (time <= 0f) return;
             this.SongtimeText = $"{time.Minutes()}:{time.Seconds():00}";
-            this._songtimeRing.fillAmount = Mathf.Round(this._audioTimeSyncController.songTime) / this._audioTimeSyncController.songLength;
+            this._songtimeRing.fillAmount = Mathf.Floor(time) / Mathf.Floor(this._audioTimeSyncController.songLength);
             this._songtimeRing.SetVerticesDirty();
         }
 
