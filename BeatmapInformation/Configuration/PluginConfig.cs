@@ -1,6 +1,6 @@
-﻿using System;
+﻿using IPA.Config.Stores;
+using System;
 using System.Runtime.CompilerServices;
-using IPA.Config.Stores;
 
 [assembly: InternalsVisibleTo(GeneratedStore.AssemblyVisibilityTarget)]
 namespace BeatmapInformation.Configuration
@@ -12,27 +12,30 @@ namespace BeatmapInformation.Configuration
         public virtual bool LockPosition { get; set; } = false;
         public virtual bool ChangeScale { get; set; } = false;
         public virtual float ScreenScale { get; set; } = 0.02f;
+        public virtual bool SongTimerVisible { get; set; } = true;
+        public virtual float SontTimeRingScale { get; set; } = 1.7f;
+        public virtual float SongTimeTextFontSize { get; set; } = 7f;
         public virtual bool CoverVisible { get; set; } = true;
         public virtual float CoverPivotPos { get; set; } = 0.75f;
+        public virtual float CoverAlpha { get; set; } = 0.75f;
         public virtual float CoverSize { get; set; } = 40f;
-        public virtual int SongNameFontSize { get; set; } = 13;
-        public virtual int SongSubNameFontSize { get; set; } = 5;
-        public virtual int SongAuthorNameFontSize { get; set; } = 5;
+        public virtual float SongNameFontSize { get; set; } = 13;
+        public virtual float SongSubNameFontSize { get; set; } = 5;
+        public virtual float SongAuthorNameFontSize { get; set; } = 5;
         public virtual bool ScoreVisible { get; set; } = true;
-        public virtual int ScoreFontSize { get; set; } = 12;
+        public virtual float ScoreFontSize { get; set; } = 12;
         public virtual bool ComboVisible { get; set; } = true;
-        public virtual int ComboFontSize { get; set; } = 7;
+        public virtual float ComboFontSize { get; set; } = 7;
         public virtual bool SeidoVisible { get; set; } = true;
-        public virtual int SeidoFontSize { get; set; } = 10;
+        public virtual float SeidoFontSize { get; set; } = 10;
         public virtual bool RankVisible { get; set; } = true;
-        public virtual int RankFontSize { get; set; } = 10;
+        public virtual float RankFontSize { get; set; } = 10;
         public virtual float TextSpaceHeight { get; set; } = 105f;
         public virtual bool DifficulityLabelVisible { get; set; } = true;
         public virtual int DifficulityLabelFontSize { get; set; } = 5;
         public virtual float SubTextSpacing { get; set; } = -1;
         public virtual float ScoreTextSpacing { get; set; } = -5;
         public virtual float RankTextSpacing { get; set; } = -5;
-        //public virtual float ScreenScale { get; set; } = 0f;
         public virtual float ScreenPosX { get; set; } = 0f;
         public virtual float ScreenPosY { get; set; } = 0.7f;
         public virtual float ScreenPosZ { get; set; } = -1.1f;
@@ -45,11 +48,9 @@ namespace BeatmapInformation.Configuration
         /// <summary>
         /// This is called whenever BSIPA reads the config from disk (including when file changes are detected).
         /// </summary>
-        public virtual void OnReload()
-        {
+        public virtual void OnReload() =>
             // Do stuff after config is read from disk.
             this.OnReloaded?.Invoke(this);
-        }
 
         /// <summary>
         /// Call this to force BSIPA to update the config file. This is also called by BSIPA if it detects the file was modified.
@@ -70,8 +71,12 @@ namespace BeatmapInformation.Configuration
             this.ChangeScale = other.ChangeScale;
             this.ScreenScale = other.ScreenScale;
             this.CoverVisible = other.CoverVisible;
+            this.CoverAlpha = other.CoverAlpha;
             this.CoverPivotPos = other.CoverPivotPos;
             this.CoverSize = other.CoverSize;
+            this.SongTimerVisible = other.SongTimerVisible;
+            this.SontTimeRingScale = other.SontTimeRingScale;
+            this.SongTimeTextFontSize = other.SongTimeTextFontSize;
             this.TextSpaceHeight = other.TextSpaceHeight;
             this.SongNameFontSize = other.SongNameFontSize;
             this.SongSubNameFontSize = other.SongSubNameFontSize;

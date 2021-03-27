@@ -3,12 +3,6 @@ using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
 using SiraUtil.Zenject;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using IPALogger = IPA.Logging.Logger;
 
 namespace BeatmapInformation
@@ -37,16 +31,9 @@ namespace BeatmapInformation
         }
 
         [OnStart]
-        public void OnApplicationStart()
-        {
-            Log.Debug("OnApplicationStart");
-        }
+        public void OnApplicationStart() => Log.Debug("OnApplicationStart");
 
         [OnExit]
-        public void OnApplicationQuit()
-        {
-            Log.Debug("OnApplicationQuit");
-
-        }
+        public void OnApplicationQuit() => Log.Debug("OnApplicationQuit");
     }
 }
