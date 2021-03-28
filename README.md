@@ -15,7 +15,7 @@ SongCore
 |SongTimerVisible|bool|曲の進行具合を表すかどうかを設定します。trueにすると表示されます。|
 |SontTimeRingScale|float|曲の進行時間を表すリングの大きさを変更します。|
 |SongTimeTextFontSize|float|曲の進行時間のテキストサイズを変更します。|
-|CoverVisible||曲のカバー画像を表示するかどうかを設定します。trueにすると表示されます。|
+|CoverVisible|bool|曲のカバー画像を表示するかどうかを設定します。trueにすると表示されます。|
 |CoverPivotPos|float|カバー画像の移動起点となるピボットの位置を表します。|
 |CoverAlpha|float|曲時間を表示しているときのカバー画像の透明度を表します。|
 |CoverSize|float|曲のカバー画像のサイズを変更します。|
