@@ -1,4 +1,5 @@
-﻿using BeatmapInformation.Configuration;
+﻿using BeatmapInformation.AudioSpectrums;
+using BeatmapInformation.Configuration;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.FloatingScreen;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -378,17 +379,30 @@ namespace BeatmapInformation.Views
 
             set => this.SetProperty(ref this.rankTextSpacing_, value);
         }
+
+        /// <summary>波形表示 を取得、設定</summary>
+        private bool audioSpectromVisible_;
+        [UIValue("audiospectrom-visible")]
+        /// <summary>波形表示 を取得、設定</summary>
+        public bool AudioSpectromVisible
+        {
+            get => this.audioSpectromVisible_;
+
+            set => this.SetProperty(ref this.audioSpectromVisible_, value);
+        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // Unity Message
         private void Update()
         {
+            // デバッグ中はBSML再読み込みを頻繁に行うのでカバー画像再読み込みしないと不便だけどリリースするときには消して何ら問題ない
 #if DEBUG
             if (Input.GetKeyDown(KeyCode.Q)) {
                 HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
             }
 #endif
             this.UpdateSongTime();
+            this.UpdateAudioSpectroms();
         }
 
 
@@ -532,8 +546,44 @@ namespace BeatmapInformation.Views
             var time = this._audioTimeSyncController.songTime;
             if (time <= 0f) return;
             this.SongtimeText = $"{time.Minutes()}:{time.Seconds():00}";
-            this._songtimeRing.fillAmount = Mathf.Round(this._audioTimeSyncController.songTime) / this._audioTimeSyncController.songLength;
+            this._songtimeRing.fillAmount = Mathf.Floor(time) / this._songLength;
             this._songtimeRing.SetVerticesDirty();
+
+//#if DEBUG
+//            foreach (var image in this.audioSpectromGroup.GetComponentsInChildren<ImageView>()) {
+//                image.fillAmount = Mathf.Floor(time) / this._songLength; ;
+//                image.SetVerticesDirty();
+//            }
+//#endif
+        }
+
+        private void CreateSpctromImages()
+        {
+            var spectromImageGO = new GameObject("AudioSpectrom", typeof(ImageView));
+            var spectromImage = spectromImageGO.GetComponent<ImageView>();
+            //foreach (var image in Resources.FindObjectsOfTypeAll<Sprite>().OrderBy(X => X.name)) {
+            //    Logger.Debug($"{image}");
+            //}
+            spectromImage.rectTransform.sizeDelta = new Vector2(10f, 100f);
+            spectromImage.type = Image.Type.Filled;
+            spectromImage.fillMethod = Image.FillMethod.Vertical;
+            spectromImage.sprite = Sprite.Create(new Texture2D(10, 100), new Rect(0, 0, 10, 100), Vector2.one / 2); //Resources.FindObjectsOfTypeAll<Sprite>().FirstOrDefault(x => x.name == "SquareShadow");
+            spectromImage.color = new Color(Color.gray.r, Color.gray.g, Color.gray.b, 0.3f);
+            spectromImage.fillAmount = 1f;
+            this.audioSpectromGroup.transform.SetAsFirstSibling();
+            foreach (var item in this._audioSpectrum.MeanLevels.Select((x, y) => y)) {
+                var copyImage = Instantiate(spectromImage, this.audioSpectromGroup.transform);
+            }
+            this._spectroms = this.audioSpectromGroup.GetComponentsInChildren<ImageView>().ToArray();
+        }
+
+        private void UpdateAudioSpectroms()
+        {
+            foreach (var image in this._spectroms.Select((x, y) => (x, y))) {
+                var value = Mathf.Max(0f, this._audioSpectrum.MeanLevels[image.y]) * 7;
+                image.x.fillAmount = value >= 1f ? 1f : value;
+                image.x.SetVerticesDirty();
+            }
         }
 
         private void OnDidResumeEvent()
@@ -597,6 +647,8 @@ namespace BeatmapInformation.Views
             this.SubTextSpacing = p.SubTextSpacing;
             this.ScoreTextSpacing = p.ScoreTextSpacing;
             this.RankTextSpacing = p.RankTextSpacing;
+
+            this.AudioSpectromVisible = p.AudioSpectromVisible;
 
             if (this._informationScreen == null || !this._informationScreen) {
                 return;
@@ -669,13 +721,17 @@ namespace BeatmapInformation.Views
         private readonly ImageView _songtimeRing;
         private VRPointer _pointer;
         private Sprite _coverSprite;
-        //private GameObject _timeCanvasGO;
+        private AudioSpectrum _audioSpectrum;
+        private ImageView[] _spectroms;
+        [UIComponent("audio-spectrom-group")]
+        private HorizontalLayoutGroup audioSpectromGroup;
+        private float _songLength;
         private static readonly object _lockObject = new object();
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
         [Inject]
-        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule, AudioTimeSyncController audioTimeSyncController)
+        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule, AudioTimeSyncController audioTimeSyncController, AudioSpectrum audioSpectrum)
         {
             Logger.Debug("Constractor call");
             try {
@@ -684,6 +740,7 @@ namespace BeatmapInformation.Views
                 this._audioTimeSyncController = audioTimeSyncController;
                 this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
                 this._pauseController = pauseController;
+                this._audioSpectrum = audioSpectrum;
                 this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
                 if (!PluginConfig.Instance.Enable) {
                     return;
@@ -694,6 +751,7 @@ namespace BeatmapInformation.Views
                     Logger.Debug("previewmap is null!");
                     return;
                 }
+                this._songLength = Mathf.Floor(this._audioTimeSyncController.songLength);
                 this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
                 this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
                 this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
@@ -716,6 +774,7 @@ namespace BeatmapInformation.Views
                 this.SongSubName = previewBeatmapLevel.songSubName;
                 this.SongAuthor = previewBeatmapLevel.songAuthorName;
                 this.Difficulity = diff.difficulty.ToString();
+                this.CreateSpctromImages();
                 this.UpdateComboText(0);
                 PluginConfig.Instance.OnReloaded += this.OnReloaded;
                 PluginConfig.Instance.OnChenged += this.OnChenged;
