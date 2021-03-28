@@ -99,6 +99,7 @@ namespace BeatmapInformation.Configuration
             this.ScoreTextSpacing = other.ScoreTextSpacing;
             this.RankTextSpacing = other.RankTextSpacing;
             this.AudioSpectrumVisible = other.AudioSpectrumVisible;
+            this.AudioSpectrumAlpha = other.AudioSpectrumAlpha;
             this.ScreenPosX = other.ScreenPosX;
             this.ScreenPosY = other.ScreenPosY;
             this.ScreenPosZ = other.ScreenPosZ;
