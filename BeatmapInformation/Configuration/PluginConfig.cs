@@ -33,7 +33,7 @@ namespace BeatmapInformation.Configuration
         public virtual float RankFontSize { get; set; } = 10;
         public virtual float TextSpaceHeight { get; set; } = 105f;
         public virtual bool DifficulityLabelVisible { get; set; } = true;
-        public virtual int DifficulityLabelFontSize { get; set; } = 5;
+        public virtual float DifficulityLabelFontSize { get; set; } = 5f;
         public virtual float SubTextSpacing { get; set; } = -1;
         public virtual float ScoreTextSpacing { get; set; } = -5;
         public virtual float RankTextSpacing { get; set; } = -5;

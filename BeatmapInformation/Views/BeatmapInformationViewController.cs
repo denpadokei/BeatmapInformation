@@ -205,10 +205,10 @@ namespace BeatmapInformation.Views
         }
 
         /// <summary>難易度フォントサイズ を取得、設定</summary>
-        private int difficulityFontsize_;
+        private float difficulityFontsize_;
         [UIValue("difficulity-fontsize")]
         /// <summary>難易度フォントサイズ を取得、設定</summary>
-        public int DifficulityFontSize
+        public float DifficulityFontSize
         {
             get => this.difficulityFontsize_;
 
@@ -761,6 +761,7 @@ namespace BeatmapInformation.Views
                 if (!PluginConfig.Instance.Enable) {
                     return;
                 }
+                this._audioSpectrum.Band = AudioSpectrum.BandType.ThirtyOneBand;
                 var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
                 var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
                 if (previewBeatmapLevel == null) {

@@ -48,12 +48,12 @@ namespace BeatmapInformation.AudioSpectrums
 
         #region Public variables
         public int numberOfSamples = 1024;
-        public BandType bandType = BandType.TenBand;
         public float fallSpeed = 0.08f;
         public float sensibility = 8.0f;
         #endregion
 
         #region Private variables
+        private BandType bandType = BandType.TenBand;
         private float[] rawSpectrum;
         private float[] levels;
         private float[] peakLevels;
@@ -62,19 +62,38 @@ namespace BeatmapInformation.AudioSpectrums
 
         #region Public property
         public float[] Levels => this.levels;
-
         public float[] PeakLevels => this.peakLevels;
-
         public float[] MeanLevels => this.meanLevels;
+        public BandType Band
+        {
+            get => this.bandType;
+
+            set => this.SetBandType(ref this.bandType, value);
+        }
         #endregion
 
         #region Private functions
+        private bool SetBandType(ref BandType bt, BandType value)
+        {
+            if (bt == value) {
+                return false;
+            }
+            bt = value;
+            var bandCount = middleFrequenciesForBands[(int)bt].Length;
+            if (this.levels.Length != bandCount) {
+                this.levels = new float[bandCount];
+                this.peakLevels = new float[bandCount];
+                this.meanLevels = new float[bandCount];
+            }
+            return true;
+        }
+
         private void CheckBuffers()
         {
             if (this.rawSpectrum == null || this.rawSpectrum.Length != this.numberOfSamples) {
                 this.rawSpectrum = new float[this.numberOfSamples];
             }
-            var bandCount = middleFrequenciesForBands[(int)this.bandType].Length;
+            var bandCount = middleFrequenciesForBands[(int)this.Band].Length;
             if (this.levels == null || this.levels.Length != bandCount) {
                 this.levels = new float[bandCount];
                 this.peakLevels = new float[bandCount];
@@ -98,8 +117,8 @@ namespace BeatmapInformation.AudioSpectrums
 
             AudioListener.GetSpectrumData(this.rawSpectrum, 0, FFTWindow.BlackmanHarris);
 
-            var middlefrequencies = middleFrequenciesForBands[(int)this.bandType];
-            var bandwidth = bandwidthForBands[(int)this.bandType];
+            var middlefrequencies = middleFrequenciesForBands[(int)this.Band];
+            var bandwidth = bandwidthForBands[(int)this.Band];
 
             var falldown = this.fallSpeed * Time.deltaTime;
             var filter = Mathf.Exp(-this.sensibility * Time.deltaTime);
