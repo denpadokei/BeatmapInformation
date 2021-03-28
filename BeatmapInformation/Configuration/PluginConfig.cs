@@ -36,6 +36,7 @@ namespace BeatmapInformation.Configuration
         public virtual float SubTextSpacing { get; set; } = -1;
         public virtual float ScoreTextSpacing { get; set; } = -5;
         public virtual float RankTextSpacing { get; set; } = -5;
+        public virtual bool AudioSpectromVisible { get; set; } = true;
         public virtual float ScreenPosX { get; set; } = 0f;
         public virtual float ScreenPosY { get; set; } = 0.7f;
         public virtual float ScreenPosZ { get; set; } = -1.1f;
@@ -94,6 +95,7 @@ namespace BeatmapInformation.Configuration
             this.SubTextSpacing = other.SubTextSpacing;
             this.ScoreTextSpacing = other.ScoreTextSpacing;
             this.RankTextSpacing = other.RankTextSpacing;
+            this.AudioSpectromVisible = other.AudioSpectromVisible;
             this.ScreenPosX = other.ScreenPosX;
             this.ScreenPosY = other.ScreenPosY;
             this.ScreenPosZ = other.ScreenPosZ;
