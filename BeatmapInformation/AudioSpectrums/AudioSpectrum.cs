@@ -12,7 +12,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 // https://github.com/keijiro/unity-audio-spectrum
 using UnityEngine;
-using System.Collections;
 
 namespace BeatmapInformation.AudioSpectrums
 {
@@ -29,7 +28,7 @@ namespace BeatmapInformation.AudioSpectrums
             ThirtyOneBand
         };
 
-        static float[][] middleFrequenciesForBands = {
+        private static readonly float[][] middleFrequenciesForBands = {
         new float[]{ 125.0f, 500, 1000, 2000 },
         new float[]{ 250.0f, 400, 600, 800 },
         new float[]{ 63.0f, 125, 500, 1000, 2000, 4000, 6000, 8000 },
@@ -37,7 +36,7 @@ namespace BeatmapInformation.AudioSpectrums
         new float[]{ 25.0f, 31.5f, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000 },
         new float[]{ 20.0f, 25, 31.5f, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000 },
     };
-        static float[] bandwidthForBands = {
+        private static readonly float[] bandwidthForBands = {
         1.414f, // 2^(1/2)
         1.260f, // 2^(1/3)
         1.414f, // 2^(1/2)
@@ -55,80 +54,68 @@ namespace BeatmapInformation.AudioSpectrums
         #endregion
 
         #region Private variables
-        float[] rawSpectrum;
-        float[] levels;
-        float[] peakLevels;
-        float[] meanLevels;
+        private float[] rawSpectrum;
+        private float[] levels;
+        private float[] peakLevels;
+        private float[] meanLevels;
         #endregion
 
         #region Public property
-        public float[] Levels
-        {
-            get { return levels; }
-        }
+        public float[] Levels => this.levels;
 
-        public float[] PeakLevels
-        {
-            get { return peakLevels; }
-        }
+        public float[] PeakLevels => this.peakLevels;
 
-        public float[] MeanLevels
-        {
-            get { return meanLevels; }
-        }
+        public float[] MeanLevels => this.meanLevels;
         #endregion
 
         #region Private functions
-        void CheckBuffers()
+        private void CheckBuffers()
         {
-            if (rawSpectrum == null || rawSpectrum.Length != numberOfSamples) {
-                rawSpectrum = new float[numberOfSamples];
+            if (this.rawSpectrum == null || this.rawSpectrum.Length != this.numberOfSamples) {
+                this.rawSpectrum = new float[this.numberOfSamples];
             }
-            var bandCount = middleFrequenciesForBands[(int)bandType].Length;
-            if (levels == null || levels.Length != bandCount) {
-                levels = new float[bandCount];
-                peakLevels = new float[bandCount];
-                meanLevels = new float[bandCount];
+            var bandCount = middleFrequenciesForBands[(int)this.bandType].Length;
+            if (this.levels == null || this.levels.Length != bandCount) {
+                this.levels = new float[bandCount];
+                this.peakLevels = new float[bandCount];
+                this.meanLevels = new float[bandCount];
             }
         }
 
-        int FrequencyToSpectrumIndex(float f)
+        private int FrequencyToSpectrumIndex(float f)
         {
-            var i = Mathf.FloorToInt(f / AudioSettings.outputSampleRate * 2.0f * rawSpectrum.Length);
-            return Mathf.Clamp(i, 0, rawSpectrum.Length - 1);
+            var i = Mathf.FloorToInt(f / AudioSettings.outputSampleRate * 2.0f * this.rawSpectrum.Length);
+            return Mathf.Clamp(i, 0, this.rawSpectrum.Length - 1);
         }
         #endregion
 
         #region Monobehaviour functions
-        void Awake()
+        private void Awake() => this.CheckBuffers();
+
+        private void Update()
         {
-            CheckBuffers();
-        }
+            this.CheckBuffers();
 
-        void Update()
-        {
-            CheckBuffers();
+            AudioListener.GetSpectrumData(this.rawSpectrum, 0, FFTWindow.BlackmanHarris);
 
-            AudioListener.GetSpectrumData(rawSpectrum, 0, FFTWindow.BlackmanHarris);
+            var middlefrequencies = middleFrequenciesForBands[(int)this.bandType];
+            var bandwidth = bandwidthForBands[(int)this.bandType];
 
-            float[] middlefrequencies = middleFrequenciesForBands[(int)bandType];
-            var bandwidth = bandwidthForBands[(int)bandType];
+            var falldown = this.fallSpeed * Time.deltaTime;
+            var filter = Mathf.Exp(-this.sensibility * Time.deltaTime);
 
-            var falldown = fallSpeed * Time.deltaTime;
-            var filter = Mathf.Exp(-sensibility * Time.deltaTime);
-
-            for (var bi = 0; bi < levels.Length; bi++) {
-                int imin = FrequencyToSpectrumIndex(middlefrequencies[bi] / bandwidth);
-                int imax = FrequencyToSpectrumIndex(middlefrequencies[bi] * bandwidth);
+            for (var bi = 0; bi < this.levels.Length; bi++) {
+                var imin = this.FrequencyToSpectrumIndex(middlefrequencies[bi] / bandwidth);
+                var imax = this.FrequencyToSpectrumIndex(middlefrequencies[bi] * bandwidth);
 
                 var bandMax = 0.0f;
                 for (var fi = imin; fi <= imax; fi++) {
-                    bandMax = Mathf.Max(bandMax, rawSpectrum[fi]);
+                    bandMax = Mathf.Max(bandMax, this.rawSpectrum[fi]);
                 }
 
-                levels[bi] = bandMax;
-                peakLevels[bi] = Mathf.Max(peakLevels[bi] - falldown, bandMax);
-                meanLevels[bi] = bandMax - (bandMax - meanLevels[bi]) * filter;
+                this.levels[bi] = bandMax;
+                this.peakLevels[bi] = Mathf.Max(this.peakLevels[bi] - falldown, bandMax);
+                this.meanLevels[bi] = bandMax - (bandMax - this.meanLevels[bi]) * filter;
             }
         }
         #endregion

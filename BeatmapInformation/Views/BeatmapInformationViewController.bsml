@@ -29,5 +29,7 @@
       </vertical>
     </vertical>
   </horizontal>
-  <horizontal id='audio-spectrom-group' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' active='~audiospectrom-visible'></horizontal>
+  <horizontal id='audio-spectrom-group' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' active='~audiospectrom-visible'>
+    <image id='audio-spetrum' image-color='grey' active='false'></image>
+  </horizontal>
 </bg>

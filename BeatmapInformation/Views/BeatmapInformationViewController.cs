@@ -547,42 +547,44 @@ namespace BeatmapInformation.Views
             if (time <= 0f) return;
             this.SongtimeText = $"{time.Minutes()}:{time.Seconds():00}";
             this._songtimeRing.fillAmount = Mathf.Floor(time) / this._songLength;
-            this._songtimeRing.SetVerticesDirty();
-
-//#if DEBUG
-//            foreach (var image in this.audioSpectromGroup.GetComponentsInChildren<ImageView>()) {
-//                image.fillAmount = Mathf.Floor(time) / this._songLength; ;
-//                image.SetVerticesDirty();
-//            }
-//#endif
         }
 
         private void CreateSpctromImages()
         {
-            var spectromImageGO = new GameObject("AudioSpectrom", typeof(ImageView));
+            var spectromImageGO = Instantiate(this.baseAudioSpectumImage.gameObject);
+            spectromImageGO.SetActive(true);
             var spectromImage = spectromImageGO.GetComponent<ImageView>();
-            //foreach (var image in Resources.FindObjectsOfTypeAll<Sprite>().OrderBy(X => X.name)) {
-            //    Logger.Debug($"{image}");
-            //}
+            spectromImage.enabled = false;
             spectromImage.rectTransform.sizeDelta = new Vector2(10f, 100f);
             spectromImage.type = Image.Type.Filled;
             spectromImage.fillMethod = Image.FillMethod.Vertical;
-            spectromImage.sprite = Sprite.Create(new Texture2D(10, 100), new Rect(0, 0, 10, 100), Vector2.one / 2); //Resources.FindObjectsOfTypeAll<Sprite>().FirstOrDefault(x => x.name == "SquareShadow");
-            spectromImage.color = new Color(Color.gray.r, Color.gray.g, Color.gray.b, 0.3f);
+            spectromImage.sprite = Sprite.Create(new Texture2D(10, 100), new Rect(0, 0, 10, 100), Vector2.one / 2);
+            spectromImage.color = new Color(spectromImage.color.r, spectromImage.color.g, spectromImage.color.b, PluginConfig.Instance.AudioSpectrumAlpha);
             spectromImage.fillAmount = 1f;
-            this.audioSpectromGroup.transform.SetAsFirstSibling();
+            var images = new List<ImageView>();
             foreach (var item in this._audioSpectrum.MeanLevels.Select((x, y) => y)) {
-                var copyImage = Instantiate(spectromImage, this.audioSpectromGroup.transform);
+                var copyImage = Instantiate(spectromImage, this.baseAudioSpectumImage.gameObject.transform.parent, false);
+                copyImage.enabled = true;
+                images.Add(copyImage);
             }
-            this._spectroms = this.audioSpectromGroup.GetComponentsInChildren<ImageView>().ToArray();
+            this._spectroms = images.ToArray();
         }
 
         private void UpdateAudioSpectroms()
         {
+            if (this._spectroms == null) {
+                return;
+            }
             foreach (var image in this._spectroms.Select((x, y) => (x, y))) {
                 var value = Mathf.Max(0f, this._audioSpectrum.MeanLevels[image.y]) * 7;
                 image.x.fillAmount = value >= 1f ? 1f : value;
-                image.x.SetVerticesDirty();
+            }
+        }
+
+        private void UpdateSpectumAlpha()
+        {
+            foreach (var image in this._spectroms) {
+                image.color = new Color(image.color.r, image.color.g, image.color.b, PluginConfig.Instance.AudioSpectrumAlpha);
             }
         }
 
@@ -602,6 +604,12 @@ namespace BeatmapInformation.Views
             }
             this._informationScreen.ShowHandle = true;
             this._informationScreen.screenMover.enabled = true;
+        }
+
+        [UIAction("#post-parse")]
+        private void PostParse()
+        {
+            this.CreateSpctromImages();
         }
 
         private void OnChenged(PluginConfig obj) => this.SetConfigValue(obj);
@@ -648,7 +656,7 @@ namespace BeatmapInformation.Views
             this.ScoreTextSpacing = p.ScoreTextSpacing;
             this.RankTextSpacing = p.RankTextSpacing;
 
-            this.AudioSpectromVisible = p.AudioSpectromVisible;
+            this.AudioSpectromVisible = p.AudioSpectrumVisible;
 
             if (this._informationScreen == null || !this._informationScreen) {
                 return;
@@ -656,6 +664,10 @@ namespace BeatmapInformation.Views
             lock (_lockObject) {
                 this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
                 this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
+                this.UpdateSpectumAlpha();
+                var canvas = this._informationScreen.gameObject.GetComponentInChildren<Canvas>();
+                var setting = this._curvedCanvasSettingsHelper.GetCurvedCanvasSettings(canvas);
+                setting?.SetRadius(p.ScreenRadius);
                 if (PluginConfig.Instance.ChangeScale) {
                     this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
                 }
@@ -724,7 +736,10 @@ namespace BeatmapInformation.Views
         private AudioSpectrum _audioSpectrum;
         private ImageView[] _spectroms;
         [UIComponent("audio-spectrom-group")]
-        private HorizontalLayoutGroup audioSpectromGroup;
+        private readonly HorizontalLayoutGroup audioSpectromGroup;
+        [UIComponent("audio-spetrum")]
+        private ImageView baseAudioSpectumImage;
+        private CurvedCanvasSettingsHelper _curvedCanvasSettingsHelper;
         private float _songLength;
         private static readonly object _lockObject = new object();
         #endregion
@@ -742,6 +757,7 @@ namespace BeatmapInformation.Views
                 this._pauseController = pauseController;
                 this._audioSpectrum = audioSpectrum;
                 this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
+                this._curvedCanvasSettingsHelper = new CurvedCanvasSettingsHelper();
                 if (!PluginConfig.Instance.Enable) {
                     return;
                 }
@@ -760,7 +776,7 @@ namespace BeatmapInformation.Views
                 this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
 
                 this.SetConfigValue(PluginConfig.Instance);
-                this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f));
+                this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f), PluginConfig.Instance.ScreenRadius);
                 this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
                 this._informationScreen.transform.rotation = Quaternion.Euler(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ);
                 if (PluginConfig.Instance.ChangeScale) {
@@ -774,7 +790,6 @@ namespace BeatmapInformation.Views
                 this.SongSubName = previewBeatmapLevel.songSubName;
                 this.SongAuthor = previewBeatmapLevel.songAuthorName;
                 this.Difficulity = diff.difficulty.ToString();
-                this.CreateSpctromImages();
                 this.UpdateComboText(0);
                 PluginConfig.Instance.OnReloaded += this.OnReloaded;
                 PluginConfig.Instance.OnChenged += this.OnChenged;
