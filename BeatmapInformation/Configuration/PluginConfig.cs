@@ -117,6 +117,14 @@ namespace BeatmapInformation.Configuration
             this.ScreenRotX = other.ScreenRotX;
             this.ScreenRotY = other.ScreenRotY;
             this.ScreenRotZ = other.ScreenRotZ;
+            this.SongNameFormat = other.SongNameFormat;
+            this.SongSubNameFormat = other.SongSubNameFormat;
+            this.SongAuthorNameFormat = other.SongAuthorNameFormat;
+            this.DifficurityFormat = other.DifficurityFormat;
+            this.ScoreFormat = other.ScoreFormat;
+            this.ComboFormat = other.ComboFormat;
+            this.SeidoFormat = other.SeidoFormat;
+            this.RankFormat = other.RankFormat;
         }
     }
 }
