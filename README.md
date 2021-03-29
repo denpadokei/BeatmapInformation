@@ -41,6 +41,21 @@ SongCore
 |ScreenPosX|float|スクリーンのX座標を設定します。|
 |ScreenPosY|float|スクリーンのY座標を設定します。|
 |ScreenPosZ|float|スクリーンのZ座標を設定します。|
-|ScreenRotX|float|スクリーンのX軸回転角を設定します。|
-|ScreenRotY|float|スクリーンのY軸回転角を設定します。|
-|ScreenRotZ|float|スクリーンのZ軸回転角を設定します。|
+|SongNameFormat|string|曲名が入るスペースに表示する文字列を設定します。|
+|SongSubNameFormat|string|曲サブタイトルが入るスペースに表示する文字列を設定します。|
+|SongAuthorNameFormat|string|作曲者が入るスペースに表示する文字列を設定します。|
+|DifficulityFormat|string|難易度が入るスペースに表示する文字列を設定します。|
+|ScoreFormat|string|スコアが入るスペースに表示する文字列を設定します。|
+|ComboFormat|string|コンボが入るスペースに表示する文字列を設定します。|
+|SeidoFormat|string|精度が入るスペースに表示する文字列を設定します。|
+|RankFormat|string|ランクが入るスペースに表示する文字列を設定します。|
+## 置換される文字列  
+|置換元|置換先|
+|:---|:---|
+|%SONG_NAME%|曲名|
+|%SONG_SUB_NAME%|曲のサブタイトル|
+|%SONG_AUTHOR_NAME%|作曲者|
+|%SCORE%|スコア（数字のみ、3桁区切りで,が入る）|
+|%COMBO%|コンボ数（数字のみ）|
+|%SEIDO%|数字のみ（小数点以下2桁）|
+|%RANK%|ランク|
