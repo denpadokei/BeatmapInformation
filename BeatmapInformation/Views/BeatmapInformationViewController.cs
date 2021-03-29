@@ -1,5 +1,6 @@
 ﻿using BeatmapInformation.AudioSpectrums;
 using BeatmapInformation.Configuration;
+using BeatmapInformation.Models;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.FloatingScreen;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -452,6 +453,12 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
+        public void ResetView()
+        {
+            this.OnComboDidChangeEvent(0);
+            this.OnRelativeScoreOrImmediateRankDidChangeEvent();
+            this.OnScoreDidChangeEvent(0, 0);
+        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プライベートメソッド
@@ -460,7 +467,7 @@ namespace BeatmapInformation.Views
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="arg2"></param>
-        private void OnScoreDidChangeEvent(int arg1, int arg2) => this.Score = $"{arg2:#,0}";
+        private void OnScoreDidChangeEvent(int arg1, int arg2) => this.Score = this._textFormatter.ConverScore(PluginConfig.Instance.ScoreFormat, arg2);
         /// <summary>
         /// コンボ数が変化したときに呼び出されます。
         /// </summary>
@@ -477,16 +484,16 @@ namespace BeatmapInformation.Views
         /// <summary>
         /// ランク表示を更新します。
         /// </summary>
-        private void UpdateRankText() => this.Rank = RankModel.GetRankName(this._relativeScoreAndImmediateRankCounter.immediateRank);
+        private void UpdateRankText() => this.Rank = this._textFormatter.ConvertRank(PluginConfig.Instance.RankFormat, RankModel.GetRankName(this._relativeScoreAndImmediateRankCounter.immediateRank));
         /// <summary>
         /// 精度を更新します。
         /// </summary>
-        private void UpdateSeidoText() => this.Seido = $"{this._relativeScoreAndImmediateRankCounter.relativeScore * 100:0.00} %";
+        private void UpdateSeidoText() => this.Seido = this._textFormatter.ConvertSeido(PluginConfig.Instance.SeidoFormat, this._relativeScoreAndImmediateRankCounter.relativeScore);
         /// <summary>
         /// コンボ数を更新します。
         /// </summary>
         /// <param name="combo"></param>
-        private void UpdateComboText(int combo) => this.Combo = $"{combo} <size=50%>COMBO</size>";
+        private void UpdateComboText(int combo) => this.Combo = this._textFormatter.ConvertCombo(PluginConfig.Instance.ComboFormat, combo);
         /// <summary>
         /// カバー画像を更新します。
         /// </summary>
@@ -570,6 +577,17 @@ namespace BeatmapInformation.Views
             this._spectroms = images.ToArray();
         }
 
+        private void RebuildAudioSpectroms()
+        {
+            foreach (var image in this._spectroms) {
+                if (image) {
+                    Destroy(image);
+                }
+                this._spectroms = Array.Empty<ImageView>();
+            }
+            this.CreateSpctromImages();
+        }
+
         private void UpdateAudioSpectroms()
         {
             if (this._spectroms == null) {
@@ -609,7 +627,11 @@ namespace BeatmapInformation.Views
         [UIAction("#post-parse")]
         private void PostParse()
         {
+            this.StartCoroutine(this.SetCover(this._coverSprite));
             this.CreateSpctromImages();
+            this.CanvasConfigUpdate();
+
+            this.ResetView();
         }
 
         private void OnChenged(PluginConfig obj) => this.SetConfigValue(obj);
@@ -657,6 +679,7 @@ namespace BeatmapInformation.Views
             this.RankTextSpacing = p.RankTextSpacing;
 
             this.AudioSpectromVisible = p.AudioSpectrumVisible;
+            this._audioSpectrum.Band = AudioSpectrum.ConvertToBandtype(p.BandType);
 
             if (this._informationScreen == null || !this._informationScreen) {
                 return;
@@ -664,6 +687,7 @@ namespace BeatmapInformation.Views
             lock (_lockObject) {
                 this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
                 this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
+                this.RebuildAudioSpectroms();
                 this.UpdateSpectumAlpha();
                 var canvas = this._informationScreen.gameObject.GetComponentInChildren<Canvas>();
                 var setting = this._curvedCanvasSettingsHelper.GetCurvedCanvasSettings(canvas);
@@ -734,19 +758,20 @@ namespace BeatmapInformation.Views
         private VRPointer _pointer;
         private Sprite _coverSprite;
         private AudioSpectrum _audioSpectrum;
-        private ImageView[] _spectroms;
+        private ImageView[] _spectroms = Array.Empty<ImageView>();
         [UIComponent("audio-spectrom-group")]
         private readonly HorizontalLayoutGroup audioSpectromGroup;
         [UIComponent("audio-spetrum")]
         private ImageView baseAudioSpectumImage;
         private CurvedCanvasSettingsHelper _curvedCanvasSettingsHelper;
+        private TextFormatter _textFormatter;
         private float _songLength;
         private static readonly object _lockObject = new object();
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
         [Inject]
-        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule, AudioTimeSyncController audioTimeSyncController, AudioSpectrum audioSpectrum)
+        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule, AudioTimeSyncController audioTimeSyncController, AudioSpectrum audioSpectrum, TextFormatter textFormatter)
         {
             Logger.Debug("Constractor call");
             try {
@@ -756,12 +781,14 @@ namespace BeatmapInformation.Views
                 this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
                 this._pauseController = pauseController;
                 this._audioSpectrum = audioSpectrum;
+                this._textFormatter = textFormatter;
                 this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
                 this._curvedCanvasSettingsHelper = new CurvedCanvasSettingsHelper();
                 if (!PluginConfig.Instance.Enable) {
                     return;
                 }
-                this._audioSpectrum.Band = AudioSpectrum.BandType.ThirtyOneBand;
+                var band = AudioSpectrum.ConvertToBandtype(PluginConfig.Instance.BandType);
+                this._audioSpectrum.Band = band;
                 var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
                 var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
                 if (previewBeatmapLevel == null) {
@@ -785,13 +812,10 @@ namespace BeatmapInformation.Views
                 }
                 this._informationScreen.HandleGrabbed += this.OnHandleGrabbed;
                 this._informationScreen.HandleReleased += this.OnHandleReleased;
-                HMMainThreadDispatcher.instance.Enqueue(this.CanvasConfigUpdate());
-                HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
-                this.SongName = previewBeatmapLevel.songName;
-                this.SongSubName = previewBeatmapLevel.songSubName;
-                this.SongAuthor = previewBeatmapLevel.songAuthorName;
-                this.Difficulity = diff.difficulty.ToString();
-                this.UpdateComboText(0);
+                this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat);
+                this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat);
+                this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat);
+                this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat);
                 PluginConfig.Instance.OnReloaded += this.OnReloaded;
                 PluginConfig.Instance.OnChenged += this.OnChenged;
             }

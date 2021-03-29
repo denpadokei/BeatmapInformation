@@ -11,6 +11,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  */
 
 // https://github.com/keijiro/unity-audio-spectrum
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace BeatmapInformation.AudioSpectrums
@@ -44,6 +46,13 @@ namespace BeatmapInformation.AudioSpectrums
         1.122f, // 2^(1/6)
         1.122f  // 2^(1/6)
     };
+        #endregion
+
+        #region Public method
+        public static BandType ConvertToBandtype(string bandTypeName)
+        {
+            return Enum.GetValues(typeof(AudioSpectrum.BandType)).OfType<AudioSpectrum.BandType>().FirstOrDefault(x => string.Equals(x.ToString(), bandTypeName, StringComparison.CurrentCultureIgnoreCase));
+        }
         #endregion
 
         #region Public variables
