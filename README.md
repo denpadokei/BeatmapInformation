@@ -38,6 +38,7 @@ SongCore
 |RankTextSpacing|float|精度、ランクブロックの行間を変更します。|
 |AudioSpectrumVisible|bool|背景の音声波形を表示するかどうかを設定します。trueで表示されます。|
 |AudioSpectrumAlpha|float|音声波形の透明度を変更します。|
+|BandType|音声波形の本数。"FourBand","FourBandVisual","EightBand","TenBand","TwentySixBand"."ThirtyOneBand"のどれかから選んでください。|
 |ScreenPosX|float|スクリーンのX座標を設定します。|
 |ScreenPosY|float|スクリーンのY座標を設定します。|
 |ScreenPosZ|float|スクリーンのZ座標を設定します。|
