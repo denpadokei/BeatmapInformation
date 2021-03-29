@@ -455,6 +455,10 @@ namespace BeatmapInformation.Views
         #region // パブリックメソッド
         public void ResetView()
         {
+            this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat);
+            this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat);
+            this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat);
+            this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat);
             this.OnComboDidChangeEvent(0);
             this.OnRelativeScoreOrImmediateRankDidChangeEvent();
             this.OnScoreDidChangeEvent(0, 0);
@@ -581,7 +585,7 @@ namespace BeatmapInformation.Views
         {
             foreach (var image in this._spectroms) {
                 if (image) {
-                    Destroy(image);
+                    Destroy(image.gameObject);
                 }
                 this._spectroms = Array.Empty<ImageView>();
             }
@@ -627,8 +631,8 @@ namespace BeatmapInformation.Views
         [UIAction("#post-parse")]
         private void PostParse()
         {
-            this.StartCoroutine(this.SetCover(this._coverSprite));
-            this.CreateSpctromImages();
+            HMMainThreadDispatcher.instance.Enqueue(this.SetCover(_coverSprite));
+            this.RebuildAudioSpectroms();
             this.CanvasConfigUpdate();
 
             this.ResetView();
@@ -641,7 +645,6 @@ namespace BeatmapInformation.Views
         private void SetConfigValue(PluginConfig p)
         {
             Logger.Debug("Update Config");
-
             this.CoverVisible = p.CoverVisible;
             this.CoverSize = p.CoverSize;
             this.CoverPivot = p.CoverPivotPos;
@@ -678,24 +681,26 @@ namespace BeatmapInformation.Views
             this.ScoreTextSpacing = p.ScoreTextSpacing;
             this.RankTextSpacing = p.RankTextSpacing;
 
-            this.AudioSpectromVisible = p.AudioSpectrumVisible;
-            this._audioSpectrum.Band = AudioSpectrum.ConvertToBandtype(p.BandType);
-
-            if (this._informationScreen == null || !this._informationScreen) {
-                return;
-            }
-            lock (_lockObject) {
-                this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
-                this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
-                this.RebuildAudioSpectroms();
-                this.UpdateSpectumAlpha();
-                var canvas = this._informationScreen.gameObject.GetComponentInChildren<Canvas>();
-                var setting = this._curvedCanvasSettingsHelper.GetCurvedCanvasSettings(canvas);
-                setting?.SetRadius(p.ScreenRadius);
-                if (PluginConfig.Instance.ChangeScale) {
-                    this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
+            this.AudioSpectromVisible = p.AudioSpectrumVisible; HMMainThreadDispatcher.instance.Enqueue(() =>
+            {
+                this._audioSpectrum.Band = AudioSpectrum.ConvertToBandtype(p.BandType);
+                if (this._informationScreen == null || !this._informationScreen) {
+                    return;
                 }
-            }
+                lock (_lockObject) {
+                    this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
+                    this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
+                    this.RebuildAudioSpectroms();
+                    this.UpdateSpectumAlpha();
+                    var canvas = this._informationScreen.gameObject.GetComponentInChildren<Canvas>();
+                    var setting = this._curvedCanvasSettingsHelper.GetCurvedCanvasSettings(canvas);
+                    setting?.SetRadius(p.ScreenRadius);
+                    if (PluginConfig.Instance.ChangeScale) {
+                        this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
+                    }
+                }
+                this.ResetView();
+            });
         }
 
         private void OnHandleReleased(object sender, FloatingScreenHandleEventArgs e)
@@ -803,7 +808,6 @@ namespace BeatmapInformation.Views
                 this._pauseController.didResumeEvent += this.OnDidResumeEvent;
                 this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
 
-                this.SetConfigValue(PluginConfig.Instance);
                 this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f), PluginConfig.Instance.ScreenRadius);
                 this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
                 this._informationScreen.transform.rotation = Quaternion.Euler(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ);
@@ -812,12 +816,10 @@ namespace BeatmapInformation.Views
                 }
                 this._informationScreen.HandleGrabbed += this.OnHandleGrabbed;
                 this._informationScreen.HandleReleased += this.OnHandleReleased;
-                this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat);
-                this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat);
-                this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat);
-                this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat);
+
                 PluginConfig.Instance.OnReloaded += this.OnReloaded;
                 PluginConfig.Instance.OnChenged += this.OnChenged;
+                this.SetConfigValue(PluginConfig.Instance);
             }
             catch (Exception e) {
                 Logger.Error(e);

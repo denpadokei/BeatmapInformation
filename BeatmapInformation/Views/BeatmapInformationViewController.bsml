@@ -1,4 +1,9 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+  <background>
+    <horizontal id='audio-spectrom-group' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' active='~audiospectrom-visible' ignore-layout='true'>
+      <image id='audio-spetrum' image-color='silver' active='false'></image>
+    </horizontal>
+  </background>
   <horizontal>
     <vertical>
       <horizontal pivot-y='~cover-pivot' preferred-height='~cover-size'>
@@ -28,8 +33,5 @@
         <text text='~rank' font-size='~rank-fontsize' active='~rank-visible'></text>
       </vertical>
     </vertical>
-  </horizontal>
-  <horizontal id='audio-spectrom-group' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' active='~audiospectrom-visible'>
-    <image id='audio-spetrum' image-color='grey' active='false'></image>
   </horizontal>
 </bg>
