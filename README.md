@@ -1,5 +1,7 @@
 # BeatmapInformation
 曲の情報をプレイスペースの後ろに表示するMOD  
+![image](https://user-images.githubusercontent.com/55026301/113311340-2c95b500-9344-11eb-8d90-46aa8dd7b195.png)
+
 # 依存MOD  
 SiraUtil  
 BeatSaberMarkupLanguage  
