@@ -31,30 +31,6 @@ namespace BeatmapInformation.Models
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        public string ConverScore(string target, int score)
-        {
-            this.Score = score;
-            return this.Convert(target);
-        }
-
-        public string ConvertCombo(string target, int combo)
-        {
-            this.Combo = combo;
-            return this.Convert(target);
-        }
-
-        public string ConvertSeido(string target, double seido)
-        {
-            this.Seido = seido;
-            return this.Convert(target);
-        }
-
-        public string ConvertRank(string target, string rank)
-        {
-            this.Rank = rank;
-            return this.Convert(target);
-        }
-
         public string Convert(string target)
         {
             builder.Clear();

@@ -13,7 +13,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using VRUIControls;
@@ -439,7 +438,6 @@ namespace BeatmapInformation.Views
             this._pauseController.didPauseEvent -= this.OnDidPauseEvent;
             this._pauseController.didResumeEvent -= this.OnDidResumeEvent;
             PluginConfig.Instance.OnReloaded -= this.OnReloaded;
-            PluginConfig.Instance.OnChenged -= this.OnChenged;
             if (this._informationScreen != null) {
                 this._informationScreen.HandleGrabbed -= this.OnHandleGrabbed;
                 this._informationScreen.HandleReleased -= this.OnHandleReleased;
@@ -453,16 +451,7 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        public void ResetView()
-        {
-            this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat);
-            this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat);
-            this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat);
-            this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat);
-            this.OnComboDidChangeEvent(0);
-            this.OnRelativeScoreOrImmediateRankDidChangeEvent();
-            this.OnScoreDidChangeEvent(0, 0);
-        }
+        public void ResetView() => this.UpdateAllText(0, 0, 1, "SS");
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プライベートメソッド
@@ -471,33 +460,42 @@ namespace BeatmapInformation.Views
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="arg2"></param>
-        private void OnScoreDidChangeEvent(int arg1, int arg2) => this.Score = this._textFormatter.ConverScore(PluginConfig.Instance.ScoreFormat, arg2);
+        private void OnScoreDidChangeEvent(int arg1, int arg2) => this.UpdateAllText(arg2);
         /// <summary>
         /// コンボ数が変化したときに呼び出されます。
         /// </summary>
         /// <param name="obj"></param>
-        private void OnComboDidChangeEvent(int obj) => this.UpdateComboText(obj);
+        private void OnComboDidChangeEvent(int obj) => this.UpdateAllText(-1, obj);
         /// <summary>
         /// 精度が変わったときに呼び出されます。
         /// </summary>
-        private void OnRelativeScoreOrImmediateRankDidChangeEvent()
+        private void OnRelativeScoreOrImmediateRankDidChangeEvent() => this.UpdateAllText(-1, -1, this._relativeScoreAndImmediateRankCounter.relativeScore, RankModel.GetRankName(this._relativeScoreAndImmediateRankCounter.immediateRank));
+        private void UpdateAllText(int score = -1, int combo = -1, double seido = -1, string rank = null)
         {
-            this.UpdateSeidoText();
-            this.UpdateRankText();
+            if (0 <= score) {
+                this._textFormatter.Score = score;
+            }
+            if (0 <= combo) {
+                this._textFormatter.Combo = combo;
+            }
+            if (0 <= seido) {
+                this._textFormatter.Seido = seido;
+            }
+            if (!string.IsNullOrEmpty(rank)) {
+                this._textFormatter.Rank = rank;
+            }
+            this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat);
+            this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat);
+            this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat);
+
+            this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat);
+
+            this.Combo = this._textFormatter.Convert(PluginConfig.Instance.ComboFormat);
+            this.Score = this._textFormatter.Convert(PluginConfig.Instance.ScoreFormat);
+
+            this.Rank = this._textFormatter.Convert(PluginConfig.Instance.RankFormat);
+            this.Seido = this._textFormatter.Convert(PluginConfig.Instance.SeidoFormat);
         }
-        /// <summary>
-        /// ランク表示を更新します。
-        /// </summary>
-        private void UpdateRankText() => this.Rank = this._textFormatter.ConvertRank(PluginConfig.Instance.RankFormat, RankModel.GetRankName(this._relativeScoreAndImmediateRankCounter.immediateRank));
-        /// <summary>
-        /// 精度を更新します。
-        /// </summary>
-        private void UpdateSeidoText() => this.Seido = this._textFormatter.ConvertSeido(PluginConfig.Instance.SeidoFormat, this._relativeScoreAndImmediateRankCounter.relativeScore);
-        /// <summary>
-        /// コンボ数を更新します。
-        /// </summary>
-        /// <param name="combo"></param>
-        private void UpdateComboText(int combo) => this.Combo = this._textFormatter.ConvertCombo(PluginConfig.Instance.ComboFormat, combo);
         /// <summary>
         /// カバー画像を更新します。
         /// </summary>
@@ -525,13 +523,24 @@ namespace BeatmapInformation.Views
                         canvas.overrideSorting = energyCanvas.overrideSorting;
                         canvas.sortingLayerID = energyCanvas.sortingLayerID;
                         canvas.sortingLayerName = energyCanvas.sortingLayerName;
-                        canvas.sortingOrder = energyCanvas.sortingOrder;
-                        canvas.gameObject.layer = energyCanvas.gameObject.layer;
+                        this.SortinglayerOrder = energyCanvas.sortingOrder;
+                        canvas.sortingOrder = this.SortinglayerOrder;
+                        canvas.gameObject.layer = PluginConfig.Instance.ScreenLayer;
                     }
                 }
             }
             catch (Exception e) {
                 Logger.Error(e);
+            }
+        }
+
+        private void UpdateScreenLayer(int layer)
+        {
+            if (!this._informationScreen) {
+                return;
+            }
+            foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
+                canvas.gameObject.layer = layer;
             }
         }
 
@@ -555,9 +564,8 @@ namespace BeatmapInformation.Views
                 return;
             }
             var time = this._audioTimeSyncController.songTime;
-            if (time <= 0f) return;
             this.SongtimeText = $"{time.Minutes()}:{time.Seconds():00}";
-            this._songtimeRing.fillAmount = Mathf.Floor(time) / this._songLength;
+            this._songtimeRing.fillAmount = (time <= 0f || this._songLength == 0) ? 1 : Mathf.Floor(time) / this._songLength;
         }
 
         private void CreateSpctromImages()
@@ -617,6 +625,9 @@ namespace BeatmapInformation.Views
             }
             this._informationScreen.ShowHandle = false;
             this._informationScreen.screenMover.enabled = false;
+            foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
+                canvas.sortingOrder = this.SortinglayerOrder;
+            }
         }
 
         private void OnDidPauseEvent()
@@ -626,14 +637,18 @@ namespace BeatmapInformation.Views
             }
             this._informationScreen.ShowHandle = true;
             this._informationScreen.screenMover.enabled = true;
+
+            foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
+                canvas.sortingOrder = UI_SORTING_ORDER;
+            }
         }
 
         [UIAction("#post-parse")]
         private void PostParse()
         {
-            HMMainThreadDispatcher.instance.Enqueue(this.SetCover(_coverSprite));
+            HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
+            HMMainThreadDispatcher.instance.Enqueue(this.CanvasConfigUpdate());
             this.RebuildAudioSpectroms();
-            this.CanvasConfigUpdate();
 
             this.ResetView();
         }
@@ -690,6 +705,7 @@ namespace BeatmapInformation.Views
                 lock (_lockObject) {
                     this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
                     this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
+                    this.UpdateScreenLayer(p.ScreenLayer);
                     this.RebuildAudioSpectroms();
                     this.UpdateSpectumAlpha();
                     var canvas = this._informationScreen.gameObject.GetComponentInChildren<Canvas>();
@@ -764,14 +780,14 @@ namespace BeatmapInformation.Views
         private Sprite _coverSprite;
         private AudioSpectrum _audioSpectrum;
         private ImageView[] _spectroms = Array.Empty<ImageView>();
-        [UIComponent("audio-spectrom-group")]
-        private readonly HorizontalLayoutGroup audioSpectromGroup;
         [UIComponent("audio-spetrum")]
-        private ImageView baseAudioSpectumImage;
+        private readonly ImageView baseAudioSpectumImage;
         private CurvedCanvasSettingsHelper _curvedCanvasSettingsHelper;
         private TextFormatter _textFormatter;
         private float _songLength;
         private static readonly object _lockObject = new object();
+        private int SortinglayerOrder;
+        public const int UI_SORTING_ORDER = 31;
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
@@ -818,7 +834,6 @@ namespace BeatmapInformation.Views
                 this._informationScreen.HandleReleased += this.OnHandleReleased;
 
                 PluginConfig.Instance.OnReloaded += this.OnReloaded;
-                PluginConfig.Instance.OnChenged += this.OnChenged;
                 this.SetConfigValue(PluginConfig.Instance);
             }
             catch (Exception e) {
