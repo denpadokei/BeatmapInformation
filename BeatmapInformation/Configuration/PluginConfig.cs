@@ -15,6 +15,7 @@ namespace BeatmapInformation.Configuration
         public virtual bool ChangeScale { get; set; } = false;
         public virtual float ScreenScale { get; set; } = 0.02f;
         public virtual float ScreenRadius { get; set; } = 0f;
+        public virtual int ScreenLayer { get; set; } = 5;
         public virtual bool SongTimerVisible { get; set; } = true;
         public virtual float SontTimeRingScale { get; set; } = 1.7f;
         public virtual float SongTimeTextFontSize { get; set; } = 7f;
@@ -33,7 +34,7 @@ namespace BeatmapInformation.Configuration
         public virtual float SeidoFontSize { get; set; } = 10;
         public virtual bool RankVisible { get; set; } = true;
         public virtual float RankFontSize { get; set; } = 10;
-        public virtual float TextSpaceHeight { get; set; } = 105f;
+        public virtual float TextSpaceHeight { get; set; } = -1f;
         public virtual bool DifficulityLabelVisible { get; set; } = true;
         public virtual float DifficulityLabelFontSize { get; set; } = 5f;
         public virtual float SubTextSpacing { get; set; } = -1;
@@ -58,7 +59,6 @@ namespace BeatmapInformation.Configuration
         public virtual string RankFormat { get; set; } = TextFormatter.RANK;
 
         public event Action<PluginConfig> OnReloaded;
-        public event Action<PluginConfig> OnChenged;
         /// <summary>
         /// This is called whenever BSIPA reads the config from disk (including when file changes are detected).
         /// </summary>
@@ -85,6 +85,7 @@ namespace BeatmapInformation.Configuration
             this.ChangeScale = other.ChangeScale;
             this.ScreenScale = other.ScreenScale;
             this.ScreenRadius = other.ScreenRadius;
+            this.ScreenLayer = other.ScreenLayer;
             this.CoverVisible = other.CoverVisible;
             this.CoverAlpha = other.CoverAlpha;
             this.CoverPivotPos = other.CoverPivotPos;

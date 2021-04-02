@@ -14,9 +14,9 @@ namespace BeatmapInformation.Models
         public string SongName { get; private set; }
         public string SongSubName { get; private set; }
         public string SongAuthorName { get; private set; }
+        public BeatmapDifficulty Difficulty { get; private set; }
         public int Score { get; set; }
         public int Combo { get; set; }
-        public BeatmapDifficulty Difficulty { get; private set; }
         public double Seido { get; set; }
         public string Rank { get; set; }
         #endregion
@@ -31,32 +31,11 @@ namespace BeatmapInformation.Models
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        public string ConverScore(string target, int score)
-        {
-            this.Score = score;
-            return this.Convert(target);
-        }
-
-        public string ConvertCombo(string target, int combo)
-        {
-            this.Combo = combo;
-            return this.Convert(target);
-        }
-
-        public string ConvertSeido(string target, double seido)
-        {
-            this.Seido = seido;
-            return this.Convert(target);
-        }
-
-        public string ConvertRank(string target, string rank)
-        {
-            this.Rank = rank;
-            return this.Convert(target);
-        }
-
         public string Convert(string target)
         {
+            if (string.IsNullOrEmpty(target)) {
+                return "";
+            }
             builder.Clear();
             builder.Append(target);
             return builder
