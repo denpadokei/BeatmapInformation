@@ -10,10 +10,11 @@ SongCore
 |設定項目|値|説明|
 |---|---|---|
 |Enable|bool|有効、無効を設定します。trueにするとゲーム中にスクリーンが表示されます。|
-|LockPosition|bool|ポーズ中に移動できるかどうかを表します。trueにするとグリップハンドルが表示されなくなります。|
+|LockPosition|bool|ポーズ中に移動できるかどうかを表します。<br>trueにするとグリップハンドルが表示されなくなります。|
 |ChangeScale|bool|スクリーンの大きさを変更できるかどうかを表します。trueにすると大きさを変更できます。|
 |ScreenScale|float|スクリーンの大きさを変更します。|
 |ScreenRadius|float|スクリーンの曲面具合を変更します。|
+|ScreenLayer|int|スクリーンが所属するレイヤーを設定します。デフォルトは5(UIレイヤー)です。<br>0とかにするとHideUIにしても消えなくなります。|
 |SongTimerVisible|bool|曲の進行具合を表すかどうかを設定します。trueにすると表示されます。|
 |SontTimeRingScale|float|曲の進行時間を表すリングの大きさを変更します。|
 |SongTimeTextFontSize|float|曲の進行時間のテキストサイズを変更します。|
@@ -40,7 +41,7 @@ SongCore
 |RankTextSpacing|float|精度、ランクブロックの行間を変更します。|
 |AudioSpectrumVisible|bool|背景の音声波形を表示するかどうかを設定します。trueで表示されます。|
 |AudioSpectrumAlpha|float|音声波形の透明度を変更します。|
-|BandType|string|音声波形の本数。"FourBand","FourBandVisual","EightBand","TenBand","TwentySixBand"."ThirtyOneBand"のどれかから選んでください。|
+|BandType|string|音声波形の本数。<br>"FourBand","FourBandVisual","EightBand","TenBand","TwentySixBand"."ThirtyOneBand"のどれかから選んでください。|
 |ScreenPosX|float|スクリーンのX座標を設定します。|
 |ScreenPosY|float|スクリーンのY座標を設定します。|
 |ScreenPosZ|float|スクリーンのZ座標を設定します。|
