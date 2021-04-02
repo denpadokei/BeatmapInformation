@@ -14,9 +14,9 @@ namespace BeatmapInformation.Models
         public string SongName { get; private set; }
         public string SongSubName { get; private set; }
         public string SongAuthorName { get; private set; }
+        public BeatmapDifficulty Difficulty { get; private set; }
         public int Score { get; set; }
         public int Combo { get; set; }
-        public BeatmapDifficulty Difficulty { get; private set; }
         public double Seido { get; set; }
         public string Rank { get; set; }
         #endregion
@@ -33,6 +33,9 @@ namespace BeatmapInformation.Models
         #region // パブリックメソッド
         public string Convert(string target)
         {
+            if (string.IsNullOrEmpty(target)) {
+                return "";
+            }
             builder.Clear();
             builder.Append(target);
             return builder

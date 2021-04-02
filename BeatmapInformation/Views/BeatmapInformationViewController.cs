@@ -696,7 +696,8 @@ namespace BeatmapInformation.Views
             this.ScoreTextSpacing = p.ScoreTextSpacing;
             this.RankTextSpacing = p.RankTextSpacing;
 
-            this.AudioSpectromVisible = p.AudioSpectrumVisible; HMMainThreadDispatcher.instance.Enqueue(() =>
+            this.AudioSpectromVisible = p.AudioSpectrumVisible;
+            HMMainThreadDispatcher.instance.Enqueue(() =>
             {
                 this._audioSpectrum.Band = AudioSpectrum.ConvertToBandtype(p.BandType);
                 if (this._informationScreen == null || !this._informationScreen) {
