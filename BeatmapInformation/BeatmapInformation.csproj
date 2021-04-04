@@ -151,6 +151,7 @@
     <Compile Include="Installer\BMInfoGameInstaller.cs" />
     <Compile Include="Installer\BMInfoMenuInstaller.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Models\ScoreEntity.cs" />
     <Compile Include="Models\TextFormatter.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />

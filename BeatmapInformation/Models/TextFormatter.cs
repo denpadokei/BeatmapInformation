@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VRUIControls;
+using Zenject;
 
 namespace BeatmapInformation.Models
 {
@@ -15,10 +16,6 @@ namespace BeatmapInformation.Models
         public string SongSubName { get; private set; }
         public string SongAuthorName { get; private set; }
         public BeatmapDifficulty Difficulty { get; private set; }
-        public int Score { get; set; }
-        public int Combo { get; set; }
-        public double Seido { get; set; }
-        public string Rank { get; set; }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // コマンド
@@ -31,7 +28,7 @@ namespace BeatmapInformation.Models
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        public string Convert(string target)
+        public string Convert(string target, ScoreEntity scores)
         {
             if (string.IsNullOrEmpty(target)) {
                 return "";
@@ -42,11 +39,11 @@ namespace BeatmapInformation.Models
                 .Replace(SONG_NAME, this.SongName)
                 .Replace(SONG_SUB_NAME, this.SongSubName)
                 .Replace(SONG_AUTHOR_NAME, this.SongAuthorName)
-                .Replace(SCORE, $"{this.Score:#,0}")
-                .Replace(COMBO, $"{this.Combo}")
+                .Replace(SCORE, $"{scores.Score:#,0}")
+                .Replace(COMBO, $"{scores.Combo}")
                 .Replace(DIFFICURITY, $"{this.Difficulty}")
-                .Replace(SEIDO, $"{this.Seido * 100:0.00}")
-                .Replace(RANK, this.Rank)
+                .Replace(SEIDO, $"{scores.Seido * 100:0.00}")
+                .Replace(RANK, scores.Rank)
                 .ToString();
         }
         #endregion

@@ -437,7 +437,7 @@ namespace BeatmapInformation.Views
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent -= this.OnRelativeScoreOrImmediateRankDidChangeEvent;
             this._pauseController.didPauseEvent -= this.OnDidPauseEvent;
             this._pauseController.didResumeEvent -= this.OnDidResumeEvent;
-            PluginConfig.Instance.OnReloaded -= this.OnReloaded;
+            PluginConfig.Instance.OnReloaded -= this.OnChanged;
             if (this._informationScreen != null) {
                 this._informationScreen.HandleGrabbed -= this.OnHandleGrabbed;
                 this._informationScreen.HandleReleased -= this.OnHandleReleased;
@@ -451,50 +451,57 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        public void ResetView() => this.UpdateAllText(0, 0, 1, "SS");
+        public void ResetView() => this.UpdateAllText(0, 0, 1, RankModel.Rank.SS);
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プライベートメソッド
-        /// <summary>
-        /// スコアが更新されたときに呼び出されます。
-        /// </summary>
-        /// <param name="arg1"></param>
-        /// <param name="arg2"></param>
-        private void OnScoreDidChangeEvent(int arg1, int arg2) => this.UpdateAllText(arg2);
         /// <summary>
         /// コンボ数が変化したときに呼び出されます。
         /// </summary>
         /// <param name="obj"></param>
         private void OnComboDidChangeEvent(int obj) => this.UpdateAllText(-1, obj);
         /// <summary>
+        /// スコアが変化したときに呼び出されます。
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        private void OnScoreDidChangeEvent(int arg1, int arg2) => this.UpdateAllText(arg2);
+        /// <summary>
         /// 精度が変わったときに呼び出されます。
         /// </summary>
-        private void OnRelativeScoreOrImmediateRankDidChangeEvent() => this.UpdateAllText(-1, -1, this._relativeScoreAndImmediateRankCounter.relativeScore, RankModel.GetRankName(this._relativeScoreAndImmediateRankCounter.immediateRank));
-        private void UpdateAllText(int score = -1, int combo = -1, double seido = -1, string rank = null)
+        private void OnRelativeScoreOrImmediateRankDidChangeEvent() => this.UpdateAllText(-1, -1, this._relativeScoreAndImmediateRankCounter.relativeScore, this._relativeScoreAndImmediateRankCounter.immediateRank);
+        private void UpdateAllText(int score = -1, int combo = -1, float seido = -1, RankModel.Rank rank = RankModel.Rank.SS)
         {
-            if (0 <= score) {
-                this._textFormatter.Score = score;
-            }
-            if (0 <= combo) {
-                this._textFormatter.Combo = combo;
-            }
-            if (0 <= seido) {
-                this._textFormatter.Seido = seido;
-            }
-            if (!string.IsNullOrEmpty(rank)) {
-                this._textFormatter.Rank = rank;
-            }
-            this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat);
-            this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat);
-            this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat);
 
-            this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat);
+            if (0 <= score && this._score < score) {
+                this._score = score;
+            }
+            if (0 <= combo && this._combo != combo) {
+                this._combo = combo;
+            }
+            if (0 <= seido && this._seido != seido) {
+                this._seido = seido;
+            }
+            if (this._rank != rank) {
+                this._rank = rank;
+            }
+            var entity = this._scoreContainer.Spawn();
+            entity.Set(this._score, this._combo, this._seido, this._rank);
+            HMMainThreadDispatcher.instance.Enqueue(() =>
+            {
+                this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat, entity);
+                this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat, entity);
+                this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat, entity);
 
-            this.Combo = this._textFormatter.Convert(PluginConfig.Instance.ComboFormat);
-            this.Score = this._textFormatter.Convert(PluginConfig.Instance.ScoreFormat);
+                this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat, entity);
 
-            this.Rank = this._textFormatter.Convert(PluginConfig.Instance.RankFormat);
-            this.Seido = this._textFormatter.Convert(PluginConfig.Instance.SeidoFormat);
+                this.Combo = this._textFormatter.Convert(PluginConfig.Instance.ComboFormat, entity);
+                this.Score = this._textFormatter.Convert(PluginConfig.Instance.ScoreFormat, entity);
+
+                this.Rank = this._textFormatter.Convert(PluginConfig.Instance.RankFormat, entity);
+                this.Seido = this._textFormatter.Convert(PluginConfig.Instance.SeidoFormat, entity);
+                this._scoreContainer.Despawn(entity);
+            });
         }
         /// <summary>
         /// カバー画像を更新します。
@@ -652,11 +659,7 @@ namespace BeatmapInformation.Views
 
             this.ResetView();
         }
-
-        private void OnChenged(PluginConfig obj) => this.SetConfigValue(obj);
-
-        private void OnReloaded(PluginConfig obj) => this.SetConfigValue(obj);
-
+        private void OnChanged(PluginConfig obj) => this.SetConfigValue(obj);
         private void SetConfigValue(PluginConfig p)
         {
             Logger.Debug("Update Config");
@@ -735,7 +738,6 @@ namespace BeatmapInformation.Views
                 PluginConfig.Instance.ScreenRotZ = rot.z;
             }
         }
-
         private void OnHandleGrabbed(object sender, FloatingScreenHandleEventArgs e) => Logger.Debug($"Handle Grabbed");
 
         /// <summary>
@@ -785,15 +787,21 @@ namespace BeatmapInformation.Views
         private readonly ImageView baseAudioSpectumImage;
         private CurvedCanvasSettingsHelper _curvedCanvasSettingsHelper;
         private TextFormatter _textFormatter;
+        private MemoryPoolContainer<ScoreEntity> _scoreContainer;
         private float _songLength;
         private static readonly object _lockObject = new object();
         private int SortinglayerOrder;
         public const int UI_SORTING_ORDER = 31;
+
+        private int _score;
+        private int _combo;
+        private float _seido;
+        private RankModel.Rank _rank;
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
         [Inject]
-        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule, AudioTimeSyncController audioTimeSyncController, AudioSpectrum audioSpectrum, TextFormatter textFormatter)
+        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule, AudioTimeSyncController audioTimeSyncController, AudioSpectrum audioSpectrum, TextFormatter textFormatter, ScoreEntity.Pool scorePool)
         {
             Logger.Debug("Constractor call");
             try {
@@ -806,6 +814,7 @@ namespace BeatmapInformation.Views
                 this._textFormatter = textFormatter;
                 this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
                 this._curvedCanvasSettingsHelper = new CurvedCanvasSettingsHelper();
+                this._scoreContainer = new MemoryPoolContainer<ScoreEntity>(scorePool);
                 if (!PluginConfig.Instance.Enable) {
                     return;
                 }
@@ -834,7 +843,7 @@ namespace BeatmapInformation.Views
                 this._informationScreen.HandleGrabbed += this.OnHandleGrabbed;
                 this._informationScreen.HandleReleased += this.OnHandleReleased;
 
-                PluginConfig.Instance.OnReloaded += this.OnReloaded;
+                PluginConfig.Instance.OnReloaded += this.OnChanged;
                 this.SetConfigValue(PluginConfig.Instance);
             }
             catch (Exception e) {
