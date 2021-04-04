@@ -771,13 +771,10 @@ namespace BeatmapInformation.Views
         }
         private void OnHandleGrabbed(object sender, FloatingScreenHandleEventArgs e) => Logger.Debug($"Handle Grabbed");
 
-        private bool CheckUpdateTarget(string format)
-        {
-            return (format.Contains(TextFormatter.SCORE)
+        private bool CheckUpdateTarget(string format) => (format.Contains(TextFormatter.SCORE)
                 || format.Contains(TextFormatter.COMBO)
                 || format.Contains(TextFormatter.SEIDO)
                 || format.Contains(TextFormatter.RANK));
-        }
 
         /// <summary>
         /// プロパティへ値をセットし、Viewへ通知します

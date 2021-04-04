@@ -49,10 +49,7 @@ namespace BeatmapInformation.AudioSpectrums
         #endregion
 
         #region Public method
-        public static BandType ConvertToBandtype(string bandTypeName)
-        {
-            return Enum.GetValues(typeof(AudioSpectrum.BandType)).OfType<AudioSpectrum.BandType>().FirstOrDefault(x => string.Equals(x.ToString(), bandTypeName, StringComparison.CurrentCultureIgnoreCase));
-        }
+        public static BandType ConvertToBandtype(string bandTypeName) => Enum.GetValues(typeof(AudioSpectrum.BandType)).OfType<AudioSpectrum.BandType>().FirstOrDefault(x => string.Equals(x.ToString(), bandTypeName, StringComparison.CurrentCultureIgnoreCase));
         #endregion
 
         #region Public variables
