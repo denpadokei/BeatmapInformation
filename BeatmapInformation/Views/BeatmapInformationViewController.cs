@@ -489,17 +489,30 @@ namespace BeatmapInformation.Views
             entity.Set(this._score, this._combo, this._seido, this._rank);
             HMMainThreadDispatcher.instance.Enqueue(() =>
             {
-                this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat, entity);
-                this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat, entity);
-                this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat, entity);
-
-                this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat, entity);
-
-                this.Combo = this._textFormatter.Convert(PluginConfig.Instance.ComboFormat, entity);
-                this.Score = this._textFormatter.Convert(PluginConfig.Instance.ScoreFormat, entity);
-
-                this.Rank = this._textFormatter.Convert(PluginConfig.Instance.RankFormat, entity);
-                this.Seido = this._textFormatter.Convert(PluginConfig.Instance.SeidoFormat, entity);
+                if (this._isUpdateSongName) {
+                    this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat, entity);
+                }
+                if (this._isUpdateSongSubName) {
+                    this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat, entity);
+                }
+                if (this._isUpdateSongAuthorName) {
+                    this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat, entity);
+                }
+                if (this._isUpdateDifficurity) {
+                    this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat, entity);
+                }
+                if (this._isUpdateCombo) {
+                    this.Combo = this._textFormatter.Convert(PluginConfig.Instance.ComboFormat, entity);
+                }
+                if (this._isUpdateScore) {
+                    this.Score = this._textFormatter.Convert(PluginConfig.Instance.ScoreFormat, entity);
+                }
+                if (this._isUpdateRank) {
+                    this.Rank = this._textFormatter.Convert(PluginConfig.Instance.RankFormat, entity);
+                }
+                if (this._isUpdateSeido) {
+                    this.Seido = this._textFormatter.Convert(PluginConfig.Instance.SeidoFormat, entity);
+                }
                 this._scoreContainer.Despawn(entity);
             });
         }
@@ -700,6 +713,7 @@ namespace BeatmapInformation.Views
             this.RankTextSpacing = p.RankTextSpacing;
 
             this.AudioSpectromVisible = p.AudioSpectrumVisible;
+
             HMMainThreadDispatcher.instance.Enqueue(() =>
             {
                 this._audioSpectrum.Band = AudioSpectrum.ConvertToBandtype(p.BandType);
@@ -719,7 +733,24 @@ namespace BeatmapInformation.Views
                         this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
                     }
                 }
+
+                this._isUpdateSongName = true;
+                this._isUpdateSongSubName = true;
+                this._isUpdateSongAuthorName = true;
+                this._isUpdateDifficurity = true;
+                this._isUpdateScore = true;
+                this._isUpdateCombo = true;
+                this._isUpdateSeido = true;
+                this._isUpdateRank = true;
                 this.ResetView();
+                this._isUpdateSongName = this.CheckUpdateTarget(p.SongNameFormat);
+                this._isUpdateSongSubName = this.CheckUpdateTarget(p.SongSubNameFormat);
+                this._isUpdateSongAuthorName = this.CheckUpdateTarget(p.SongAuthorNameFormat);
+                this._isUpdateDifficurity = this.CheckUpdateTarget(p.DifficurityFormat);
+                this._isUpdateScore = this.CheckUpdateTarget(p.ScoreFormat);
+                this._isUpdateCombo = this.CheckUpdateTarget(p.ComboFormat);
+                this._isUpdateSeido = this.CheckUpdateTarget(p.SeidoFormat);
+                this._isUpdateRank = this.CheckUpdateTarget(p.RankFormat);
             });
         }
 
@@ -739,6 +770,14 @@ namespace BeatmapInformation.Views
             }
         }
         private void OnHandleGrabbed(object sender, FloatingScreenHandleEventArgs e) => Logger.Debug($"Handle Grabbed");
+
+        private bool CheckUpdateTarget(string format)
+        {
+            return (format.Contains(TextFormatter.SCORE)
+                || format.Contains(TextFormatter.COMBO)
+                || format.Contains(TextFormatter.SEIDO)
+                || format.Contains(TextFormatter.RANK));
+        }
 
         /// <summary>
         /// プロパティへ値をセットし、Viewへ通知します
@@ -797,6 +836,15 @@ namespace BeatmapInformation.Views
         private int _combo;
         private float _seido;
         private RankModel.Rank _rank;
+
+        private bool _isUpdateSongName = true;
+        private bool _isUpdateSongSubName = true;
+        private bool _isUpdateSongAuthorName = true;
+        private bool _isUpdateDifficurity = true;
+        private bool _isUpdateScore = true;
+        private bool _isUpdateCombo = true;
+        private bool _isUpdateSeido = true;
+        private bool _isUpdateRank = true;
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
