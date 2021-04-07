@@ -56,6 +56,7 @@ namespace BeatmapInformation.AudioSpectrums
         public int numberOfSamples = 1024;
         public float fallSpeed = 0.08f;
         public float sensibility = 8.0f;
+        public event Action<AudioSpectrum> UpdatedRawSpectums;
         #endregion
 
         #region Private variables
@@ -142,6 +143,8 @@ namespace BeatmapInformation.AudioSpectrums
                 this.peakLevels[bi] = Mathf.Max(this.peakLevels[bi] - falldown, bandMax);
                 this.meanLevels[bi] = bandMax - (bandMax - this.meanLevels[bi]) * filter;
             }
+
+            this.UpdatedRawSpectums?.Invoke(this);
         }
         #endregion
     }

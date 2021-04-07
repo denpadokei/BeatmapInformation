@@ -402,10 +402,7 @@ namespace BeatmapInformation.Views
             }
 #endif
             this.UpdateSongTime();
-            this.UpdateAudioSpectroms();
         }
-
-
         private IEnumerator Start()
         {
             if (!PluginConfig.Instance.Enable) {
@@ -437,6 +434,7 @@ namespace BeatmapInformation.Views
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent -= this.OnRelativeScoreOrImmediateRankDidChangeEvent;
             this._pauseController.didPauseEvent -= this.OnDidPauseEvent;
             this._pauseController.didResumeEvent -= this.OnDidResumeEvent;
+            this._audioSpectrum.UpdatedRawSpectums -= this.OnUpdatedRawSpectums;
             PluginConfig.Instance.OnReloaded -= this.OnChanged;
             if (this._informationScreen != null) {
                 this._informationScreen.HandleGrabbed -= this.OnHandleGrabbed;
@@ -588,6 +586,7 @@ namespace BeatmapInformation.Views
             this._songtimeRing.fillAmount = (time <= 0f || this._songLength == 0) ? 1 : Mathf.Floor(time) / this._songLength;
         }
 
+        private void OnUpdatedRawSpectums(AudioSpectrum obj) => this.UpdateAudioSpectroms(obj);
         private void CreateSpctromImages()
         {
             var spectromImageGO = Instantiate(this.baseAudioSpectumImage.gameObject);
@@ -620,13 +619,13 @@ namespace BeatmapInformation.Views
             this.CreateSpctromImages();
         }
 
-        private void UpdateAudioSpectroms()
+        private void UpdateAudioSpectroms(AudioSpectrum audio)
         {
-            if (this._spectroms == null) {
+            if (this._spectroms == null || !audio) {
                 return;
             }
             foreach (var image in this._spectroms.Select((x, y) => (x, y))) {
-                var value = Mathf.Max(0f, this._audioSpectrum.MeanLevels[image.y]) * 7;
+                var value = Mathf.Max(0f, audio.MeanLevels[image.y]) * 7;
                 image.x.fillAmount = value >= 1f ? 1f : value;
             }
         }
@@ -865,6 +864,7 @@ namespace BeatmapInformation.Views
                 }
                 var band = AudioSpectrum.ConvertToBandtype(PluginConfig.Instance.BandType);
                 this._audioSpectrum.Band = band;
+                this._audioSpectrum.UpdatedRawSpectums += this.OnUpdatedRawSpectums;
                 var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
                 var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
                 if (previewBeatmapLevel == null) {
