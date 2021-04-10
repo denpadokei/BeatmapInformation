@@ -538,12 +538,22 @@ namespace BeatmapInformation.Views
                     var energyGo = coreGameHUDController.GetField<GameObject, CoreGameHUDController>("_energyPanelGO");
                     var energyCanvas = energyGo.GetComponent<Canvas>();
                     foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
+                        canvas.worldCamera = Camera.main;
                         canvas.overrideSorting = energyCanvas.overrideSorting;
                         canvas.sortingLayerID = energyCanvas.sortingLayerID;
                         canvas.sortingLayerName = energyCanvas.sortingLayerName;
                         this.SortinglayerOrder = energyCanvas.sortingOrder;
                         canvas.sortingOrder = this.SortinglayerOrder;
                         canvas.gameObject.layer = PluginConfig.Instance.ScreenLayer;
+                    }
+                    foreach (var graphic in this._informationScreen.GetComponentsInChildren<Graphic>()) {
+                        graphic.raycastTarget = false;
+                    }
+                    try {
+                        Destroy(this._informationScreen.GetComponent<VRGraphicRaycaster>());
+                    }
+                    catch (Exception e) {
+                        Logger.Error(e);
                     }
                 }
             }
@@ -589,6 +599,7 @@ namespace BeatmapInformation.Views
         private void OnUpdatedRawSpectums(AudioSpectrum obj) => this.UpdateAudioSpectroms(obj);
         private void CreateSpctromImages()
         {
+            this.baseAudioSpectumImage.raycastTarget = false;
             var spectromImageGO = Instantiate(this.baseAudioSpectumImage.gameObject);
             spectromImageGO.SetActive(true);
             var spectromImage = spectromImageGO.GetComponent<ImageView>();
