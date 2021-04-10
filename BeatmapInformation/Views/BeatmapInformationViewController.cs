@@ -662,15 +662,17 @@ namespace BeatmapInformation.Views
 
         private void OnDidPauseEvent()
         {
-            if (PluginConfig.Instance.LockPosition || this._informationScreen == null) {
+            if (this._informationScreen == null) {
+                return;
+            }
+            foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
+                canvas.sortingOrder = UI_SORTING_ORDER;
+            }
+            if (PluginConfig.Instance.LockPosition) {
                 return;
             }
             this._informationScreen.ShowHandle = true;
             this._informationScreen.screenMover.enabled = true;
-
-            foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
-                canvas.sortingOrder = UI_SORTING_ORDER;
-            }
         }
 
         [UIAction("#post-parse")]
