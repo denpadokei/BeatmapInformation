@@ -402,10 +402,7 @@ namespace BeatmapInformation.Views
             }
 #endif
             this.UpdateSongTime();
-            this.UpdateAudioSpectroms();
         }
-
-
         private IEnumerator Start()
         {
             if (!PluginConfig.Instance.Enable) {
@@ -437,6 +434,7 @@ namespace BeatmapInformation.Views
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent -= this.OnRelativeScoreOrImmediateRankDidChangeEvent;
             this._pauseController.didPauseEvent -= this.OnDidPauseEvent;
             this._pauseController.didResumeEvent -= this.OnDidResumeEvent;
+            this._audioSpectrum.UpdatedRawSpectums -= this.OnUpdatedRawSpectums;
             PluginConfig.Instance.OnReloaded -= this.OnChanged;
             if (this._informationScreen != null) {
                 this._informationScreen.HandleGrabbed -= this.OnHandleGrabbed;
@@ -540,12 +538,22 @@ namespace BeatmapInformation.Views
                     var energyGo = coreGameHUDController.GetField<GameObject, CoreGameHUDController>("_energyPanelGO");
                     var energyCanvas = energyGo.GetComponent<Canvas>();
                     foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
+                        canvas.worldCamera = Camera.main;
                         canvas.overrideSorting = energyCanvas.overrideSorting;
                         canvas.sortingLayerID = energyCanvas.sortingLayerID;
                         canvas.sortingLayerName = energyCanvas.sortingLayerName;
                         this.SortinglayerOrder = energyCanvas.sortingOrder;
                         canvas.sortingOrder = this.SortinglayerOrder;
                         canvas.gameObject.layer = PluginConfig.Instance.ScreenLayer;
+                    }
+                    foreach (var graphic in this._informationScreen.GetComponentsInChildren<Graphic>()) {
+                        graphic.raycastTarget = false;
+                    }
+                    try {
+                        Destroy(this._informationScreen.GetComponent<VRGraphicRaycaster>());
+                    }
+                    catch (Exception e) {
+                        Logger.Error(e);
                     }
                 }
             }
@@ -588,8 +596,10 @@ namespace BeatmapInformation.Views
             this._songtimeRing.fillAmount = (time <= 0f || this._songLength == 0) ? 1 : Mathf.Floor(time) / this._songLength;
         }
 
+        private void OnUpdatedRawSpectums(AudioSpectrum obj) => this.UpdateAudioSpectroms(obj);
         private void CreateSpctromImages()
         {
+            this.baseAudioSpectumImage.raycastTarget = false;
             var spectromImageGO = Instantiate(this.baseAudioSpectumImage.gameObject);
             spectromImageGO.SetActive(true);
             var spectromImage = spectromImageGO.GetComponent<ImageView>();
@@ -620,13 +630,13 @@ namespace BeatmapInformation.Views
             this.CreateSpctromImages();
         }
 
-        private void UpdateAudioSpectroms()
+        private void UpdateAudioSpectroms(AudioSpectrum audio)
         {
-            if (this._spectroms == null) {
+            if (this._spectroms == null || !audio) {
                 return;
             }
             foreach (var image in this._spectroms.Select((x, y) => (x, y))) {
-                var value = Mathf.Max(0f, this._audioSpectrum.MeanLevels[image.y]) * 7;
+                var value = Mathf.Max(0f, audio.MeanLevels[image.y]) * 7;
                 image.x.fillAmount = value >= 1f ? 1f : value;
             }
         }
@@ -652,15 +662,17 @@ namespace BeatmapInformation.Views
 
         private void OnDidPauseEvent()
         {
-            if (PluginConfig.Instance.LockPosition || this._informationScreen == null) {
+            if (this._informationScreen == null) {
+                return;
+            }
+            foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
+                canvas.sortingOrder = UI_SORTING_ORDER;
+            }
+            if (PluginConfig.Instance.LockPosition) {
                 return;
             }
             this._informationScreen.ShowHandle = true;
             this._informationScreen.screenMover.enabled = true;
-
-            foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
-                canvas.sortingOrder = UI_SORTING_ORDER;
-            }
         }
 
         [UIAction("#post-parse")]
@@ -865,6 +877,7 @@ namespace BeatmapInformation.Views
                 }
                 var band = AudioSpectrum.ConvertToBandtype(PluginConfig.Instance.BandType);
                 this._audioSpectrum.Band = band;
+                this._audioSpectrum.UpdatedRawSpectums += this.OnUpdatedRawSpectums;
                 var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
                 var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
                 if (previewBeatmapLevel == null) {
