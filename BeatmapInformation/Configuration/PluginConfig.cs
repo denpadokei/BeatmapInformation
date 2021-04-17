@@ -51,8 +51,8 @@ namespace BeatmapInformation.Configuration
         public virtual float ScreenRotZ { get; set; } = 0;
         public virtual string SongNameFormat { get; set; } = TextFormatter.SONG_NAME;
         public virtual string SongSubNameFormat { get; set; } = TextFormatter.SONG_SUB_NAME;
-        public virtual string SongAuthorNameFormat { get; set; } = TextFormatter.SONG_AUTHOR_NAME;
-        public virtual string DifficurityFormat { get; set; } = TextFormatter.DIFFICURITY;
+        public virtual string SongAuthorNameFormat { get; set; } = $"<color=#888888>{TextFormatter.SONG_AUTHOR_NAME}</color>";
+        public virtual string DifficurityFormat { get; set; } = $"<color=#000000>TextFormatter.DIFFICURITY</color>";
         public virtual string ScoreFormat { get; set; } = TextFormatter.SCORE;
         public virtual string ComboFormat { get; set; } = $"{TextFormatter.COMBO} <size=50%>COMBO</size>";
         public virtual string SeidoFormat { get; set; } = $"{TextFormatter.SEIDO} %";
