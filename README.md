@@ -7,6 +7,7 @@ SiraUtil
 BeatSaberMarkupLanguage  
 SongCore  
 # 設定項目一覧  
+[床に置くときの設定のサンプル](https://github.com/denpadokei/BeatmapInformation/releases/download/0.7.0/SettingJsonTemplate.zip)  
 |設定項目|値|説明|
 |---|---|---|
 |Enable|bool|有効、無効を設定します。trueにするとゲーム中にスクリーンが表示されます。|
