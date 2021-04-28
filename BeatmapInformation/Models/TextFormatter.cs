@@ -9,6 +9,7 @@ namespace BeatmapInformation.Models
         public string SongName { get; private set; }
         public string SongSubName { get; private set; }
         public string SongAuthorName { get; private set; }
+        public string SongKey { get; set; }
         public BeatmapDifficulty Difficulty { get; private set; }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
@@ -33,6 +34,7 @@ namespace BeatmapInformation.Models
                 .Replace(SONG_NAME, this.SongName)
                 .Replace(SONG_SUB_NAME, this.SongSubName)
                 .Replace(SONG_AUTHOR_NAME, this.SongAuthorName)
+                .Replace(SONG_KEY, this.SongKey)
                 .Replace(SCORE, $"{scores.Score:#,0}")
                 .Replace(COMBO, $"{scores.Combo}")
                 .Replace(DIFFICURITY, $"{this.Difficulty}")
@@ -69,6 +71,7 @@ namespace BeatmapInformation.Models
         public const string DIFFICURITY = "%DIFFICURITY%";
         public const string SEIDO = "%SEIDO%";
         public const string RANK = "%RANK%";
+        public const string SONG_KEY = "%SONG_KEY%";
         #endregion
     }
 }
