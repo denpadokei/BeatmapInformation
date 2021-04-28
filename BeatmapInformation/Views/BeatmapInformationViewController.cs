@@ -1,6 +1,8 @@
 ﻿using BeatmapInformation.AudioSpectrums;
 using BeatmapInformation.Configuration;
 using BeatmapInformation.Models;
+using BeatmapInformation.SimpleJsons;
+using BeatmapInformation.WebClients;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.FloatingScreen;
 using BeatSaberMarkupLanguage.ViewControllers;
@@ -153,11 +155,44 @@ namespace BeatmapInformation.Views
         private float songSubNameFontSize_;
         [UIValue("song-sub-name-fontsize")]
         /// <summary>サブタイトルフォントサイズ を取得、設定</summary>
-        public float SongSUbNameFontSIze
+        public float SongSubNameFontSIze
         {
             get => this.songSubNameFontSize_;
 
             set => this.SetProperty(ref this.songSubNameFontSize_, value);
+        }
+
+        /// <summary>曲のキー を取得、設定</summary>
+        private string songKey_;
+        [UIValue("song-key")]
+        /// <summary>曲のキー を取得、設定</summary>
+        public string SongKey
+        {
+            get => this.songKey_;
+
+            set => this.SetProperty(ref this.songKey_, value);
+        }
+
+        /// <summary>曲のキーのフォントサイズ を取得、設定</summary>
+        private float songKeyFontSize_;
+        [UIValue("song-key-font-size")]
+        /// <summary>曲のキーのフォントサイズ を取得、設定</summary>
+        public float SongKeyFontSize
+        {
+            get => this.songKeyFontSize_;
+
+            set => this.SetProperty(ref this.songKeyFontSize_, value);
+        }
+
+        /// <summary>曲のキーを表示するかどうか を取得、設定</summary>
+        private bool songKeyActive_;
+        [UIValue("song-key-visible")]
+        /// <summary>曲のキーを表示するかどうか を取得、設定</summary>
+        public bool SongKeyActive
+        {
+            get => this.songKeyActive_;
+
+            set => this.SetProperty(ref this.songKeyActive_, value);
         }
 
         /// <summary>曲作者 を取得、設定</summary>
@@ -493,6 +528,9 @@ namespace BeatmapInformation.Views
                 if (this._isUpdateSongSubName) {
                     this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat, entity);
                 }
+                if (this._isUpdateSongKey) {
+                    this.SongKey = this._textFormatter.Convert(PluginConfig.Instance.SongKeyFormat, entity);
+                }
                 if (this._isUpdateSongAuthorName) {
                     this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat, entity);
                 }
@@ -702,8 +740,11 @@ namespace BeatmapInformation.Views
             this.TextSpaceWidth = 200f - p.CoverSize;
 
             this.SongNameFontSize = p.SongNameFontSize;
-            this.SongSUbNameFontSIze = p.SongSubNameFontSize;
+            this.SongSubNameFontSIze = p.SongSubNameFontSize;
             this.SongAuthorFontsize = p.SongAuthorNameFontSize;
+
+            this.SongKeyActive = p.SongKeyVisible;
+            this.SongKeyFontSize = p.SongKeyFontSize;
 
             this.ScoreVisible = p.ScoreVisible;
             this.ScoreFontsize = p.ScoreFontSize;
@@ -748,6 +789,7 @@ namespace BeatmapInformation.Views
 
                 this._isUpdateSongName = true;
                 this._isUpdateSongSubName = true;
+                this._isUpdateSongKey = true;
                 this._isUpdateSongAuthorName = true;
                 this._isUpdateDifficurity = true;
                 this._isUpdateScore = true;
@@ -757,6 +799,7 @@ namespace BeatmapInformation.Views
                 this.ResetView();
                 this._isUpdateSongName = this.CheckUpdateTarget(p.SongNameFormat);
                 this._isUpdateSongSubName = this.CheckUpdateTarget(p.SongSubNameFormat);
+                this._isUpdateSongKey = this.CheckUpdateTarget(p.SongKeyFormat);
                 this._isUpdateSongAuthorName = this.CheckUpdateTarget(p.SongAuthorNameFormat);
                 this._isUpdateDifficurity = this.CheckUpdateTarget(p.DifficurityFormat);
                 this._isUpdateScore = this.CheckUpdateTarget(p.ScoreFormat);
@@ -848,6 +891,7 @@ namespace BeatmapInformation.Views
 
         private bool _isUpdateSongName = true;
         private bool _isUpdateSongSubName = true;
+        private bool _isUpdateSongKey = true;
         private bool _isUpdateSongAuthorName = true;
         private bool _isUpdateDifficurity = true;
         private bool _isUpdateScore = true;
@@ -884,6 +928,13 @@ namespace BeatmapInformation.Views
                     Logger.Debug("previewmap is null!");
                     return;
                 }
+                var hash = previewBeatmapLevel.levelID.Split('_').LastOrDefault();
+                var beatmap = await WebClient.GetAsync($"https://beatsaver.com/api/maps/by-hash/{hash}", CancellationToken.None);
+                if (!string.IsNullOrEmpty(beatmap?.ContentToString())) {
+                    var json = JSON.Parse(beatmap.ContentToString());
+                    textFormatter.SongKey = json["key"];
+                }
+                
                 this._songLength = Mathf.Floor(this._audioTimeSyncController.songLength);
                 this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
                 this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;

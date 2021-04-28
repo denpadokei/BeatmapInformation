@@ -26,6 +26,8 @@ namespace BeatmapInformation.Configuration
         public virtual float SongNameFontSize { get; set; } = 13;
         public virtual float SongSubNameFontSize { get; set; } = 5;
         public virtual float SongAuthorNameFontSize { get; set; } = 5;
+        public virtual bool SongKeyVisible { get; set; } = false;
+        public virtual float SongKeyFontSize { get; set; } = 5;
         public virtual bool ScoreVisible { get; set; } = true;
         public virtual float ScoreFontSize { get; set; } = 12;
         public virtual bool ComboVisible { get; set; } = true;
@@ -52,6 +54,7 @@ namespace BeatmapInformation.Configuration
         public virtual string SongNameFormat { get; set; } = TextFormatter.SONG_NAME;
         public virtual string SongSubNameFormat { get; set; } = TextFormatter.SONG_SUB_NAME;
         public virtual string SongAuthorNameFormat { get; set; } = $"<color=#888888>{TextFormatter.SONG_AUTHOR_NAME}</color>";
+        public virtual string SongKeyFormat { get; set; } = $"!bsr {TextFormatter.SONG_KEY}";
         public virtual string DifficurityFormat { get; set; } = $"<color=#000000>TextFormatter.DIFFICURITY</color>";
         public virtual string ScoreFormat { get; set; } = TextFormatter.SCORE;
         public virtual string ComboFormat { get; set; } = $"{TextFormatter.COMBO} <size=50%>COMBO</size>";
@@ -96,6 +99,9 @@ namespace BeatmapInformation.Configuration
             this.TextSpaceHeight = other.TextSpaceHeight;
             this.SongNameFontSize = other.SongNameFontSize;
             this.SongSubNameFontSize = other.SongSubNameFontSize;
+            this.SongKeyFontSize = other.SongKeyFontSize;
+            this.SongKeyVisible = other.SongKeyVisible;
+            this.SongKeyFormat = other.SongKeyFormat;
             this.SongAuthorNameFontSize = other.SongAuthorNameFontSize;
             this.ScoreVisible = other.ScoreVisible;
             this.ScoreFontSize = other.ScoreFontSize;

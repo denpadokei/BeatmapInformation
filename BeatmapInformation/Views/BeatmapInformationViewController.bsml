@@ -19,6 +19,7 @@
       </vertical>
       <vertical horizontal-fit='Unconstrained' vertical-fit='PreferredSize' spacing='~sub-text-spacing' child-expand-height='false'>
         <text text='~song-sub-name' font-size='~song-sub-name-fontsize' overflow-mode='Ellipsis' word-wrapping='false'></text>
+        <text text='~song-key' font-size='~song-key-font-size' active='~song-key-visible' word-wrapping='false'></text>
         <text text='~song-author' font-size='~song-author-fontsize' overflow-mode='Ellipsis' word-wrapping='false'></text>
         <vertical bg-color='white' background='panel-top' horizontal-fit='PreferredSize' pad-left='2' pad-right='2' spacing='3' child-align='MiddleLeft' pivot-x ='0' active='~difficulity-label-visible' vertical-fit='PreferredSize'>
           <text text='~difficulity' font-size='~difficulity-fontsize' overflow-mode='Ellipsis' word-wrapping='false' color='black' align='Midline'></text>
