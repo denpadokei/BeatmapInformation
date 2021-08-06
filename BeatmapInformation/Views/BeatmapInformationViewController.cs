@@ -929,10 +929,10 @@ namespace BeatmapInformation.Views
                     return;
                 }
                 var hash = previewBeatmapLevel.levelID.Split('_').LastOrDefault();
-                var beatmap = await WebClient.GetAsync($"https://beatsaver.com/api/maps/by-hash/{hash}", CancellationToken.None);
+                var beatmap = await WebClient.GetAsync($"https://beatsaver.com/api/maps/hash/{hash}", CancellationToken.None);
                 if (!string.IsNullOrEmpty(beatmap?.ContentToString())) {
                     var json = JSON.Parse(beatmap.ContentToString());
-                    textFormatter.SongKey = json["key"];
+                    textFormatter.SongKey = json["id"];
                 }
                 
                 this._songLength = Mathf.Floor(this._audioTimeSyncController.songLength);
