@@ -69,7 +69,7 @@ namespace BeatmapInformation.WebClients
             {
                 Timeout = new TimeSpan(0, 0, 15)
             };
-            _client.DefaultRequestHeaders.UserAgent.TryParseAdd($"{meta.Name}/{meta.Version}");
+            _client.DefaultRequestHeaders.UserAgent.TryParseAdd($"{meta.Name}/{meta.HVersion}");
         }
 
         internal static async Task<WebResponse> GetAsync(string url, CancellationToken token)
