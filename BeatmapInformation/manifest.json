@@ -3,7 +3,7 @@
   "id": "BeatmapInformation",
   "name": "BeatmapInformation",
   "author": "denpadokei",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "",
   "gameVersion": "1.14.0",
   "dependsOn": {

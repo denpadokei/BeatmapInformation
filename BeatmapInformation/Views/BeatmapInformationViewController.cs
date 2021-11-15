@@ -467,8 +467,10 @@ namespace BeatmapInformation.Views
             this._scoreController.scoreDidChangeEvent -= this.OnScoreDidChangeEvent;
             this._scoreController.comboDidChangeEvent -= this.OnComboDidChangeEvent;
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent -= this.OnRelativeScoreOrImmediateRankDidChangeEvent;
-            this._pauseController.didPauseEvent -= this.OnDidPauseEvent;
-            this._pauseController.didResumeEvent -= this.OnDidResumeEvent;
+            if (this._pauseController != null) {
+                this._pauseController.didPauseEvent -= this.OnDidPauseEvent;
+                this._pauseController.didResumeEvent -= this.OnDidResumeEvent;
+            }
             this._audioSpectrum.UpdatedRawSpectums -= this.OnUpdatedRawSpectums;
             PluginConfig.Instance.OnReloaded -= this.OnChanged;
             if (this._informationScreen != null) {
@@ -861,7 +863,7 @@ namespace BeatmapInformation.Views
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // メンバ変数
         private ScoreController _scoreController;
-        private AudioTimeSyncController _audioTimeSyncController;
+        private IAudioTimeSource _audioTimeSyncController;
         private GameplayCoreSceneSetupData _gameplayCoreSceneSetupData;
         private FloatingScreen _informationScreen;
         private RelativeScoreAndImmediateRankCounter _relativeScoreAndImmediateRankCounter;
@@ -902,20 +904,24 @@ namespace BeatmapInformation.Views
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
         [Inject]
-        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, PauseController pauseController, VRInputModule inputModule, AudioTimeSyncController audioTimeSyncController, AudioSpectrum audioSpectrum, TextFormatter textFormatter, ScoreEntity.Pool scorePool)
+        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, VRInputModule inputModule, IAudioTimeSource audioTimeSource, AudioSpectrum audioSpectrum, TextFormatter textFormatter, ScoreEntity.Pool scorePool, DiContainer container)
         {
             Logger.Debug("Constractor call");
             try {
                 this._scoreController = scoreController;
                 this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
-                this._audioTimeSyncController = audioTimeSyncController;
+                this._audioTimeSyncController = audioTimeSource;
                 this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
-                this._pauseController = pauseController;
+                
                 this._audioSpectrum = audioSpectrum;
                 this._textFormatter = textFormatter;
                 this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
                 this._curvedCanvasSettingsHelper = new CurvedCanvasSettingsHelper();
                 this._scoreContainer = new MemoryPoolContainer<ScoreEntity>(scorePool);
+
+                this._pauseController = container.TryResolve<PauseController>();
+
+
                 if (!PluginConfig.Instance.Enable) {
                     return;
                 }
@@ -935,12 +941,14 @@ namespace BeatmapInformation.Views
                     textFormatter.SongKey = json["id"];
                 }
                 
-                this._songLength = Mathf.Floor(this._audioTimeSyncController.songLength);
+                this._songLength = Mathf.Floor(this._audioTimeSyncController.songEndTime);
                 this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
                 this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
                 this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
-                this._pauseController.didPauseEvent += this.OnDidPauseEvent;
-                this._pauseController.didResumeEvent += this.OnDidResumeEvent;
+                if (this._pauseController != null) {
+                    this._pauseController.didPauseEvent += this.OnDidPauseEvent;
+                    this._pauseController.didResumeEvent += this.OnDidResumeEvent;
+                }
                 this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
 
                 this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f), PluginConfig.Instance.ScreenRadius);

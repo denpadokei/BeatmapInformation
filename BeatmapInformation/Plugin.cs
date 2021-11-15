@@ -26,7 +26,7 @@ namespace BeatmapInformation
             Log.Info("BeatmapInformation initialized.");
             Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
             Log.Debug("Config loaded");
-            zenjector.OnGame<BMInfoGameInstaller>().OnlyForStandard();
+            zenjector.OnGame<BMInfoGameInstaller>(false);
             zenjector.OnMenu<BMInfoMenuInstaller>();
         }
 
