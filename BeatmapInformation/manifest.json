@@ -3,13 +3,13 @@
   "id": "BeatmapInformation",
   "name": "BeatmapInformation",
   "author": "denpadokei",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "",
-  "gameVersion": "1.14.0",
+  "gameVersion": "1.19.0",
   "dependsOn": {
     "BSIPA": "^4.1.6",
     "BeatSaberMarkupLanguage": "^1.5.2",
-    "SiraUtil": "^2.5.2",
+    "SiraUtil": "^3.0.0",
     "SongCore": "^3.2.2"
   },
   "features": []
