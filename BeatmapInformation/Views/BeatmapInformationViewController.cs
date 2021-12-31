@@ -425,6 +425,94 @@ namespace BeatmapInformation.Views
 
             set => this.SetProperty(ref this.audioSpectromVisible_, value);
         }
+
+        /// <summary>波形表示のアンカーMinX を取得、設定</summary>
+        private float bgAncherMinX_;
+        [UIValue("bg-ancher-min-x")]
+        /// <summary>波形表示のアンカーMinX を取得、設定</summary>
+        public float BGAncherMinX
+        {
+            get => this.bgAncherMinX_;
+
+            set => this.SetProperty(ref this.bgAncherMinX_, value);
+        }
+
+        /// <summary>波形表示アンカーMaxX を取得、設定</summary>
+        private float _bgAncherMaxX;
+        [UIValue("bg-ancher-max-x")]
+        /// <summary>波形表示アンカーMaxX を取得、設定</summary>
+        public float BGAncherMaxX
+        {
+            get => this._bgAncherMaxX;
+
+            set => this.SetProperty(ref this._bgAncherMaxX, value);
+        }
+
+        /// <summary>波形表示アンカーMinY を取得、設定</summary>
+        private float _bgAncherMinY;
+        [UIValue("bg-ancher-min-y")]
+        /// <summary>波形表示アンカーMinY を取得、設定</summary>
+        public float BGAncherMinY
+        {
+            get => this._bgAncherMinY;
+
+            set => this.SetProperty(ref this._bgAncherMinY, value);
+        }
+
+        /// <summary>波形表示アンカーMaxY を取得、設定</summary>
+        private float _bgAncherMaxY;
+        [UIValue("bg-ancher-max-y")]
+        /// <summary>波形表示アンカーMaxY を取得、設定</summary>
+        public float BGAncherMaxY
+        {
+            get => this._bgAncherMaxY;
+
+            set => this.SetProperty(ref this._bgAncherMaxY, value);
+        }
+
+        /// <summary>テキスト表示アンカーMinX を取得、設定</summary>
+        private float _textAncherMinX;
+        [UIValue("text-ancher-min-x")]
+        /// <summary>テキスト表示アンカーMinX を取得、設定</summary>
+        public float TextAncherMinX
+        {
+            get => this._textAncherMinX;
+
+            set => this.SetProperty(ref this._textAncherMinX, value);
+        }
+
+        /// <summary>テキスト表示アンカーMaxX を取得、設定</summary>
+        private float _textAncherMaxX;
+        [UIValue("text-ancher-max-x")]
+        /// <summary>テキスト表示アンカーMaxX を取得、設定</summary>
+        public float TextAncherMaxX
+        {
+            get => this._textAncherMaxX;
+
+            set => this.SetProperty(ref this._textAncherMaxX, value);
+        }
+
+        /// <summary>テキスト表示アンカーMinY を取得、設定</summary>
+        private float _textAncherMinY;
+        [UIValue("text-ancher-min-y")]
+        /// <summary>テキスト表示アンカーMinY を取得、設定</summary>
+        public float TextAncherMinY
+        {
+            get => this._textAncherMinY;
+
+            set => this.SetProperty(ref this._textAncherMinY, value);
+        }
+
+        /// <summary>テキスト表示アンカーMaxY を取得、設定</summary>
+        private float _textAncherMaxY;
+        [UIValue("text-ancher-max-y")]
+        /// <summary>テキスト表示アンカーMaxY を取得、設定</summary>
+        public float TextAncherMaxY
+        {
+            get => this._textAncherMaxY;
+
+            set => this.SetProperty(ref this._textAncherMaxY, value);
+        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // Unity Message
@@ -769,6 +857,16 @@ namespace BeatmapInformation.Views
 
             this.AudioSpectromVisible = p.AudioSpectrumVisible;
 
+            this.BGAncherMinX = p.AncherMinX;
+            this.BGAncherMaxX = p.AncherMaxX;
+            this.BGAncherMinY = p.AncherMinY;
+            this.BGAncherMaxY = p.AncherMaxY;
+
+            this.TextAncherMinX = p.AncherMinX;
+            this.TextAncherMaxX = p.AncherMaxX;
+            this.TextAncherMinY = p.AncherMinY;
+            this.TextAncherMaxY = p.AncherMaxY;
+
             HMMainThreadDispatcher.instance.Enqueue(() =>
             {
                 this._audioSpectrum.Band = AudioSpectrum.ConvertToBandtype(p.BandType);
@@ -784,7 +882,7 @@ namespace BeatmapInformation.Views
                     var canvas = this._informationScreen.gameObject.GetComponentInChildren<Canvas>();
                     var setting = this._curvedCanvasSettingsHelper.GetCurvedCanvasSettings(canvas);
                     setting?.SetRadius(p.ScreenRadius);
-                    if (PluginConfig.Instance.ChangeScale) {
+                    if (!PluginConfig.Instance.OverlayMode && PluginConfig.Instance.ChangeScale) {
                         this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
                     }
                 }
@@ -878,6 +976,8 @@ namespace BeatmapInformation.Views
         private ImageView[] _spectroms = Array.Empty<ImageView>();
         [UIComponent("audio-spetrum")]
         private readonly ImageView baseAudioSpectumImage;
+        //[UIComponent("root-bg")]
+        //private readonly ContentSizeFitter _rootSizefitter;
         private CurvedCanvasSettingsHelper _curvedCanvasSettingsHelper;
         private TextFormatter _textFormatter;
         private MemoryPoolContainer<ScoreEntity> _scoreContainer;
@@ -953,6 +1053,14 @@ namespace BeatmapInformation.Views
 
                 this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f), PluginConfig.Instance.ScreenRadius);
                 this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
+                var canvas = this._informationScreen.GetComponentsInChildren<Canvas>(true).FirstOrDefault();
+                if (PluginConfig.Instance.OverlayMode) {
+                    canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                    this._informationScreen.transform.localScale = Vector3.one;
+                }
+                else {
+                    canvas.renderMode = RenderMode.WorldSpace;
+                }
                 this._informationScreen.transform.rotation = Quaternion.Euler(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ);
                 if (PluginConfig.Instance.ChangeScale) {
                     this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
