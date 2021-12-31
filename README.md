@@ -8,10 +8,12 @@ BeatSaberMarkupLanguage
 SongCore  
 # 設定項目一覧  
 [床に置くときの設定のサンプル](https://github.com/denpadokei/BeatmapInformation/releases/download/0.7.0/SettingJsonTemplate.zip)  
+[オーバーレイの設定のサンプル](https://github.com/denpadokei/BeatmapInformation/releases/download/1.1.0/BeatmapInformation_Config.zip)  
 |設定項目|値|説明|
 |---|---|---|
 |Enable|bool|有効、無効を設定します。trueにするとゲーム中にスクリーンが表示されます。|
 |LockPosition|bool|ポーズ中に移動できるかどうかを表します。<br>trueにするとグリップハンドルが表示されなくなります。|
+|OverlayMode|bool|ゲーム上ではなく、画面上に表示するかどうかを設定します。|
 |ChangeScale|bool|スクリーンの大きさを変更できるかどうかを表します。trueにすると大きさを変更できます。|
 |ScreenScale|float|スクリーンの大きさを変更します。|
 |ScreenRadius|float|スクリーンの曲面具合を変更します。|
@@ -46,6 +48,13 @@ SongCore
 |ScreenPosX|float|スクリーンのX座標を設定します。|
 |ScreenPosY|float|スクリーンのY座標を設定します。|
 |ScreenPosZ|float|スクリーンのZ座標を設定します。|
+|ScreenRotX|float|スクリーンのX座標を設定します。|
+|ScreenRotY|float|スクリーンのY座標を設定します。|
+|ScreenRotZ|float|スクリーンのZ座標を設定します。|
+|AncherMinX|float|オーバーレイ時スクリーンの案界の最小X座標を設定します。|
+|AncherMaxX|float|オーバーレイ時スクリーンの案界の最大x座標を設定します。|
+|AncherMinY|float|オーバーレイ時スクリーンの案界の最小y座標を設定します。|
+|AncherMaxY|float|オーバーレイ時スクリーンの案界の最大y座標を設定します。|
 |SongNameFormat|string|曲名が入るスペースに表示する文字列を設定します。|
 |SongSubNameFormat|string|曲サブタイトルが入るスペースに表示する文字列を設定します。|
 |SongAuthorNameFormat|string|作曲者が入るスペースに表示する文字列を設定します。|
@@ -60,6 +69,7 @@ SongCore
 |%SONG_NAME%|曲名|
 |%SONG_SUB_NAME%|曲のサブタイトル|
 |%SONG_AUTHOR_NAME%|作曲者|
+|%SONG_MAPPER_NAME%|作成者|
 |%SCORE%|スコア（数字のみ、3桁区切りで,が入る）|
 |%COMBO%|コンボ数（数字のみ）|
 |%SEIDO%|数字のみ（小数点以下2桁）|
