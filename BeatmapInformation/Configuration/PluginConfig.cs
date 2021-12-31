@@ -12,6 +12,7 @@ namespace BeatmapInformation.Configuration
         public static PluginConfig Instance { get; set; }
         public virtual bool Enable { get; set; } = true;
         public virtual bool LockPosition { get; set; } = false;
+        public virtual bool OverlayMode { get; set; } = false;
         public virtual bool ChangeScale { get; set; } = false;
         public virtual float ScreenScale { get; set; } = 0.02f;
         public virtual float ScreenRadius { get; set; } = 0f;
@@ -51,9 +52,13 @@ namespace BeatmapInformation.Configuration
         public virtual float ScreenRotX { get; set; } = 0;
         public virtual float ScreenRotY { get; set; } = 0;
         public virtual float ScreenRotZ { get; set; } = 0;
+        public virtual float AncherMinX { get; set; } = 0;
+        public virtual float AncherMaxX { get; set; } = 1;
+        public virtual float AncherMinY { get; set; } = 0;
+        public virtual float AncherMaxY { get; set; } = 1;
         public virtual string SongNameFormat { get; set; } = TextFormatter.SONG_NAME;
         public virtual string SongSubNameFormat { get; set; } = TextFormatter.SONG_SUB_NAME;
-        public virtual string SongAuthorNameFormat { get; set; } = $"<color=#888888>{TextFormatter.SONG_AUTHOR_NAME}</color>";
+        public virtual string SongAuthorNameFormat { get; set; } = $"<color=#888888>{TextFormatter.SONG_AUTHOR_NAME}[{TextFormatter.SONG_MAPPER_NAME}]</color>";
         public virtual string SongKeyFormat { get; set; } = $"!bsr {TextFormatter.SONG_KEY}";
         public virtual string DifficurityFormat { get; set; } = $"<color=#000000>{TextFormatter.DIFFICURITY}</color>";
         public virtual string ScoreFormat { get; set; } = TextFormatter.SCORE;

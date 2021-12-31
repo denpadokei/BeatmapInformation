@@ -1,12 +1,12 @@
-﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <background>
+﻿<bg id="root-bg" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+  <background anchor-min-x='~bg-ancher-min-x' anchor-max-x='~bg-ancher-max-x' anchor-min-y='~bg-ancher-min-y' anchor-max-y='~bg-ancher-max-y'>
     <horizontal horizontal-fit='Unconstrained' vertical-fit='Unconstrained' active='~audiospectrom-visible' ignore-layout='true'>
       <image id='audio-spetrum' image-color='silver' active='false'></image>
     </horizontal>
   </background>
-  <horizontal>
-    <vertical>
-      <horizontal pivot-y='~cover-pivot' preferred-height='~cover-size'>
+  <horizontal horizontal-fit='PreferredSize' anchor-min-x='~text-ancher-min-x' anchor-max-x='~text-ancher-max-x' anchor-min-y='~text-ancher-min-y' anchor-max-y='~text-ancher-max-y' child-align='MiddleLeft' pivot-x='0.1'>
+    <vertical horizontal-fit='PreferredSize' vertical-fit='Unconstrained' child-align='MiddleLeft'>
+      <horizontal pivot-y='~cover-pivot' preferred-height='~cover-size' horizontal-fit='PreferredSize' child-align='MiddleLeft'>
         <image id='cover' preserve-aspect='true' preferred-width='~cover-size' active='~cover-visible'></image>
         <image id='songtime-ring' preserve-aspect='true' active='~songtime-visible' ignore-layout='true'>
           <text text='~songtime-text' font-size='~songtime-fontsize' active='~songtime-visible' align='Midline'></text>
