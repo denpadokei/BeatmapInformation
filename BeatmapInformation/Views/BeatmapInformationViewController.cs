@@ -553,7 +553,7 @@ namespace BeatmapInformation.Views
         {
             Logger.Debug("OnDestroy call");
             this._scoreController.scoreDidChangeEvent -= this.OnScoreDidChangeEvent;
-            this._scoreController.comboDidChangeEvent -= this.OnComboDidChangeEvent;
+            this._comboController.comboDidChangeEvent -= this.OnComboDidChangeEvent;
             this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent -= this.OnRelativeScoreOrImmediateRankDidChangeEvent;
             if (this._pauseController != null) {
                 this._pauseController.didPauseEvent -= this.OnDidPauseEvent;
@@ -960,7 +960,8 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // メンバ変数
-        private ScoreController _scoreController;
+        private IScoreController _scoreController;
+        private IComboController _comboController;
         private IAudioTimeSource _audioTimeSyncController;
         private GameplayCoreSceneSetupData _gameplayCoreSceneSetupData;
         private FloatingScreen _informationScreen;
@@ -976,8 +977,6 @@ namespace BeatmapInformation.Views
         private ImageView[] _spectroms = Array.Empty<ImageView>();
         [UIComponent("audio-spetrum")]
         private readonly ImageView baseAudioSpectumImage;
-        //[UIComponent("root-bg")]
-        //private readonly ContentSizeFitter _rootSizefitter;
         private CurvedCanvasSettingsHelper _curvedCanvasSettingsHelper;
         private TextFormatter _textFormatter;
         private MemoryPoolContainer<ScoreEntity> _scoreContainer;
@@ -1004,11 +1003,12 @@ namespace BeatmapInformation.Views
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
         [Inject]
-        private async void Constractor(ScoreController scoreController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, VRInputModule inputModule, IAudioTimeSource audioTimeSource, AudioSpectrum audioSpectrum, TextFormatter textFormatter, ScoreEntity.Pool scorePool, DiContainer container)
+        private async void Constractor(IScoreController scoreController, IComboController comboController, GameplayCoreSceneSetupData gameplayCoreSceneSetupData, RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRankCounter, VRInputModule inputModule, IAudioTimeSource audioTimeSource, AudioSpectrum audioSpectrum, TextFormatter textFormatter, ScoreEntity.Pool scorePool, DiContainer container)
         {
             Logger.Debug("Constractor call");
             try {
                 this._scoreController = scoreController;
+                this._comboController = comboController;
                 this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
                 this._audioTimeSyncController = audioTimeSource;
                 this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
@@ -1043,7 +1043,7 @@ namespace BeatmapInformation.Views
                 
                 this._songLength = Mathf.Floor(this._audioTimeSyncController.songEndTime);
                 this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
-                this._scoreController.comboDidChangeEvent += this.OnComboDidChangeEvent;
+                this._comboController.comboDidChangeEvent += this.OnComboDidChangeEvent;
                 this._relativeScoreAndImmediateRankCounter.relativeScoreOrImmediateRankDidChangeEvent += this.OnRelativeScoreOrImmediateRankDidChangeEvent;
                 if (this._pauseController != null) {
                     this._pauseController.didPauseEvent += this.OnDidPauseEvent;
