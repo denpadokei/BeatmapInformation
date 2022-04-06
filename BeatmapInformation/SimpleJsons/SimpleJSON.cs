@@ -148,38 +148,45 @@ namespace BeatmapInformation.SimpleJsons
         public struct Enumerator
         {
             private enum Type { None, Array, Object }
-            private Type type;
+            private readonly Type type;
             private Dictionary<string, JSONNode>.Enumerator m_Object;
             private List<JSONNode>.Enumerator m_Array;
-            public bool IsValid { get { return type != Type.None; } }
+            public bool IsValid => this.type != Type.None;
             public Enumerator(List<JSONNode>.Enumerator aArrayEnum)
             {
-                type = Type.Array;
-                m_Object = default(Dictionary<string, JSONNode>.Enumerator);
-                m_Array = aArrayEnum;
+                this.type = Type.Array;
+                this.m_Object = default(Dictionary<string, JSONNode>.Enumerator);
+                this.m_Array = aArrayEnum;
             }
             public Enumerator(Dictionary<string, JSONNode>.Enumerator aDictEnum)
             {
-                type = Type.Object;
-                m_Object = aDictEnum;
-                m_Array = default(List<JSONNode>.Enumerator);
+                this.type = Type.Object;
+                this.m_Object = aDictEnum;
+                this.m_Array = default(List<JSONNode>.Enumerator);
             }
             public KeyValuePair<string, JSONNode> Current
             {
-                get {
-                    if (type == Type.Array)
-                        return new KeyValuePair<string, JSONNode>(string.Empty, m_Array.Current);
-                    else if (type == Type.Object)
-                        return m_Object.Current;
+                get
+                {
+                    if (this.type == Type.Array) {
+                        return new KeyValuePair<string, JSONNode>(string.Empty, this.m_Array.Current);
+                    }
+                    else if (this.type == Type.Object) {
+                        return this.m_Object.Current;
+                    }
+
                     return new KeyValuePair<string, JSONNode>(string.Empty, null);
                 }
             }
             public bool MoveNext()
             {
-                if (type == Type.Array)
-                    return m_Array.MoveNext();
-                else if (type == Type.Object)
-                    return m_Object.MoveNext();
+                if (this.type == Type.Array) {
+                    return this.m_Array.MoveNext();
+                }
+                else if (this.type == Type.Object) {
+                    return this.m_Object.MoveNext();
+                }
+
                 return false;
             }
         }
@@ -188,9 +195,9 @@ namespace BeatmapInformation.SimpleJsons
             private Enumerator m_Enumerator;
             public ValueEnumerator(List<JSONNode>.Enumerator aArrayEnum) : this(new Enumerator(aArrayEnum)) { }
             public ValueEnumerator(Dictionary<string, JSONNode>.Enumerator aDictEnum) : this(new Enumerator(aDictEnum)) { }
-            public ValueEnumerator(Enumerator aEnumerator) { m_Enumerator = aEnumerator; }
-            public JSONNode Current { get { return m_Enumerator.Current.Value; } }
-            public bool MoveNext() { return m_Enumerator.MoveNext(); }
+            public ValueEnumerator(Enumerator aEnumerator) { this.m_Enumerator = aEnumerator; }
+            public JSONNode Current => this.m_Enumerator.Current.Value;
+            public bool MoveNext() { return this.m_Enumerator.MoveNext(); }
             public ValueEnumerator GetEnumerator() { return this; }
         }
         public struct KeyEnumerator
@@ -198,9 +205,9 @@ namespace BeatmapInformation.SimpleJsons
             private Enumerator m_Enumerator;
             public KeyEnumerator(List<JSONNode>.Enumerator aArrayEnum) : this(new Enumerator(aArrayEnum)) { }
             public KeyEnumerator(Dictionary<string, JSONNode>.Enumerator aDictEnum) : this(new Enumerator(aDictEnum)) { }
-            public KeyEnumerator(Enumerator aEnumerator) { m_Enumerator = aEnumerator; }
-            public string Current { get { return m_Enumerator.Current.Key; } }
-            public bool MoveNext() { return m_Enumerator.MoveNext(); }
+            public KeyEnumerator(Enumerator aEnumerator) { this.m_Enumerator = aEnumerator; }
+            public string Current => this.m_Enumerator.Current.Key;
+            public bool MoveNext() { return this.m_Enumerator.MoveNext(); }
             public KeyEnumerator GetEnumerator() { return this; }
         }
 
@@ -210,34 +217,36 @@ namespace BeatmapInformation.SimpleJsons
             private Enumerator m_Enumerator;
             internal LinqEnumerator(JSONNode aNode)
             {
-                m_Node = aNode;
-                if (m_Node != null)
-                    m_Enumerator = m_Node.GetEnumerator();
+                this.m_Node = aNode;
+                if (this.m_Node != null) {
+                    this.m_Enumerator = this.m_Node.GetEnumerator();
+                }
             }
-            public KeyValuePair<string, JSONNode> Current { get { return m_Enumerator.Current; } }
-            object IEnumerator.Current { get { return m_Enumerator.Current; } }
-            public bool MoveNext() { return m_Enumerator.MoveNext(); }
+            public KeyValuePair<string, JSONNode> Current => this.m_Enumerator.Current;
+            object IEnumerator.Current => this.m_Enumerator.Current;
+            public bool MoveNext() { return this.m_Enumerator.MoveNext(); }
 
             public void Dispose()
             {
-                m_Node = null;
-                m_Enumerator = new Enumerator();
+                this.m_Node = null;
+                this.m_Enumerator = new Enumerator();
             }
 
             public IEnumerator<KeyValuePair<string, JSONNode>> GetEnumerator()
             {
-                return new LinqEnumerator(m_Node);
+                return new LinqEnumerator(this.m_Node);
             }
 
             public void Reset()
             {
-                if (m_Node != null)
-                    m_Enumerator = m_Node.GetEnumerator();
+                if (this.m_Node != null) {
+                    this.m_Enumerator = this.m_Node.GetEnumerator();
+                }
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                return new LinqEnumerator(m_Node);
+                return new LinqEnumerator(this.m_Node);
             }
         }
 
@@ -250,29 +259,29 @@ namespace BeatmapInformation.SimpleJsons
 
         public abstract JSONNodeType Tag { get; }
 
-        public virtual JSONNode this[int aIndex] { get { return null; } set { } }
+        public virtual JSONNode this[int aIndex] { get => null; set { } }
 
-        public virtual JSONNode this[string aKey] { get { return null; } set { } }
+        public virtual JSONNode this[string aKey] { get => null; set { } }
 
-        public virtual string Value { get { return ""; } set { } }
+        public virtual string Value { get => ""; set { } }
 
-        public virtual int Count { get { return 0; } }
+        public virtual int Count => 0;
 
-        public virtual bool IsNumber { get { return false; } }
-        public virtual bool IsString { get { return false; } }
-        public virtual bool IsBoolean { get { return false; } }
-        public virtual bool IsNull { get { return false; } }
-        public virtual bool IsArray { get { return false; } }
-        public virtual bool IsObject { get { return false; } }
+        public virtual bool IsNumber => false;
+        public virtual bool IsString => false;
+        public virtual bool IsBoolean => false;
+        public virtual bool IsNull => false;
+        public virtual bool IsArray => false;
+        public virtual bool IsObject => false;
 
-        public virtual bool Inline { get { return false; } set { } }
+        public virtual bool Inline { get => false; set { } }
 
         public virtual void Add(string aKey, JSONNode aItem)
         {
         }
         public virtual void Add(JSONNode aItem)
         {
-            Add("", aItem);
+            this.Add("", aItem);
         }
 
         public virtual JSONNode Remove(string aKey)
@@ -302,31 +311,33 @@ namespace BeatmapInformation.SimpleJsons
         {
             get
             {
-                foreach (var C in Children)
-                    foreach (var D in C.DeepChildren)
+                foreach (var C in this.Children) {
+                    foreach (var D in C.DeepChildren) {
                         yield return D;
+                    }
+                }
             }
         }
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            WriteToStringBuilder(sb, 0, 0, JSONTextMode.Compact);
+            var sb = new StringBuilder();
+            this.WriteToStringBuilder(sb, 0, 0, JSONTextMode.Compact);
             return sb.ToString();
         }
 
         public virtual string ToString(int aIndent)
         {
-            StringBuilder sb = new StringBuilder();
-            WriteToStringBuilder(sb, 0, aIndent, JSONTextMode.Indent);
+            var sb = new StringBuilder();
+            this.WriteToStringBuilder(sb, 0, aIndent, JSONTextMode.Indent);
             return sb.ToString();
         }
         internal abstract void WriteToStringBuilder(StringBuilder aSB, int aIndent, int aIndentInc, JSONTextMode aMode);
 
         public abstract Enumerator GetEnumerator();
-        public IEnumerable<KeyValuePair<string, JSONNode>> Linq { get { return new LinqEnumerator(this); } }
-        public KeyEnumerator Keys { get { return new KeyEnumerator(GetEnumerator()); } }
-        public ValueEnumerator Values { get { return new ValueEnumerator(GetEnumerator()); } }
+        public IEnumerable<KeyValuePair<string, JSONNode>> Linq => new LinqEnumerator(this);
+        public KeyEnumerator Keys => new KeyEnumerator(this.GetEnumerator());
+        public ValueEnumerator Values => new ValueEnumerator(this.GetEnumerator());
 
         #endregion common interface
 
@@ -337,74 +348,56 @@ namespace BeatmapInformation.SimpleJsons
         {
             get
             {
-                double v = 0.0;
-                if (double.TryParse(Value,NumberStyles.Float, CultureInfo.InvariantCulture, out v))
+                if (double.TryParse(this.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var v)) {
                     return v;
+                }
+
                 return 0.0;
             }
-            set
-            {
-                Value = value.ToString(CultureInfo.InvariantCulture);
-            }
+            set => this.Value = value.ToString(CultureInfo.InvariantCulture);
         }
 
         public virtual int AsInt
         {
-            get { return (int)AsDouble; }
-            set { AsDouble = value; }
+            get => (int)this.AsDouble;
+            set => this.AsDouble = value;
         }
 
         public virtual float AsFloat
         {
-            get { return (float)AsDouble; }
-            set { AsDouble = value; }
+            get => (float)this.AsDouble;
+            set => this.AsDouble = value;
         }
 
         public virtual bool AsBool
         {
             get
             {
-                bool v = false;
-                if (bool.TryParse(Value, out v))
+                if (bool.TryParse(this.Value, out var v)) {
                     return v;
-                return !string.IsNullOrEmpty(Value);
+                }
+
+                return !string.IsNullOrEmpty(this.Value);
             }
-            set
-            {
-                Value = (value) ? "true" : "false";
-            }
+            set => this.Value = (value) ? "true" : "false";
         }
 
         public virtual long AsLong
         {
             get
             {
-                long val = 0;
-                if (long.TryParse(Value, out val))
+                if (long.TryParse(this.Value, out var val)) {
                     return val;
+                }
+
                 return 0L;
             }
-            set
-            {
-                Value = value.ToString();
-            }
+            set => this.Value = value.ToString();
         }
 
-        public virtual JSONArray AsArray
-        {
-            get
-            {
-                return this as JSONArray;
-            }
-        }
+        public virtual JSONArray AsArray => this as JSONArray;
 
-        public virtual JSONObject AsObject
-        {
-            get
-            {
-                return this as JSONObject;
-            }
-        }
+        public virtual JSONObject AsObject => this as JSONObject;
 
 
         #endregion typecasting properties
@@ -449,8 +442,10 @@ namespace BeatmapInformation.SimpleJsons
 
         public static implicit operator JSONNode(long n)
         {
-            if (longAsString)
+            if (longAsString) {
                 return new JSONString(n.ToString());
+            }
+
             return new JSONNumber(n);
         }
         public static implicit operator long(JSONNode d)
@@ -474,12 +469,16 @@ namespace BeatmapInformation.SimpleJsons
 
         public static bool operator ==(JSONNode a, object b)
         {
-            if (ReferenceEquals(a, b))
+            if (ReferenceEquals(a, b)) {
                 return true;
-            bool aIsNull = a is JSONNull || ReferenceEquals(a, null) || a is JSONLazyCreator;
-            bool bIsNull = b is JSONNull || ReferenceEquals(b, null) || b is JSONLazyCreator;
-            if (aIsNull && bIsNull)
+            }
+
+            var aIsNull = a is JSONNull || ReferenceEquals(a, null) || a is JSONLazyCreator;
+            var bIsNull = b is JSONNull || ReferenceEquals(b, null) || b is JSONLazyCreator;
+            if (aIsNull && bIsNull) {
                 return true;
+            }
+
             return !aIsNull && a.Equals(b);
         }
 
@@ -504,9 +503,12 @@ namespace BeatmapInformation.SimpleJsons
         private static StringBuilder m_EscapeBuilder;
         internal static StringBuilder EscapeBuilder
         {
-            get {
-                if (m_EscapeBuilder == null)
+            get
+            {
+                if (m_EscapeBuilder == null) {
                     m_EscapeBuilder = new StringBuilder();
+                }
+
                 return m_EscapeBuilder;
             }
         }
@@ -514,12 +516,12 @@ namespace BeatmapInformation.SimpleJsons
         {
             var sb = EscapeBuilder;
             sb.Length = 0;
-            if (sb.Capacity < aText.Length + aText.Length / 10)
+            if (sb.Capacity < aText.Length + aText.Length / 10) {
                 sb.Capacity = aText.Length + aText.Length / 10;
-            foreach (char c in aText)
-            {
-                switch (c)
-                {
+            }
+
+            foreach (var c in aText) {
+                switch (c) {
                     case '\\':
                         sb.Append("\\\\");
                         break;
@@ -542,59 +544,63 @@ namespace BeatmapInformation.SimpleJsons
                         sb.Append("\\f");
                         break;
                     default:
-                        if (c < ' ' || (forceASCII && c > 127))
-                        {
+                        if (c < ' ' || (forceASCII && c > 127)) {
                             ushort val = c;
                             sb.Append("\\u").Append(val.ToString("X4"));
                         }
-                        else
+                        else {
                             sb.Append(c);
+                        }
+
                         break;
                 }
             }
-            string result = sb.ToString();
+            var result = sb.ToString();
             sb.Length = 0;
             return result;
         }
 
         private static JSONNode ParseElement(string token, bool quoted)
         {
-            if (quoted)
+            if (quoted) {
                 return token;
-            string tmp = token.ToLower();
-            if (tmp == "false" || tmp == "true")
+            }
+
+            var tmp = token.ToLower();
+            if (tmp == "false" || tmp == "true") {
                 return tmp == "true";
-            if (tmp == "null")
+            }
+
+            if (tmp == "null") {
                 return JSONNull.CreateOrGet();
-            double val;
-            if (double.TryParse(token, NumberStyles.Float, CultureInfo.InvariantCulture, out val))
+            }
+
+            if (double.TryParse(token, NumberStyles.Float, CultureInfo.InvariantCulture, out var val)) {
                 return val;
-            else
+            }
+            else {
                 return token;
+            }
         }
 
         public static JSONNode Parse(string aJSON)
         {
-            Stack<JSONNode> stack = new Stack<JSONNode>();
+            var stack = new Stack<JSONNode>();
             JSONNode ctx = null;
-            int i = 0;
-            StringBuilder Token = new StringBuilder();
-            string TokenName = "";
-            bool QuoteMode = false;
-            bool TokenIsQuoted = false;
-            while (i < aJSON.Length)
-            {
-                switch (aJSON[i])
-                {
+            var i = 0;
+            var Token = new StringBuilder();
+            var TokenName = "";
+            var QuoteMode = false;
+            var TokenIsQuoted = false;
+            while (i < aJSON.Length) {
+                switch (aJSON[i]) {
                     case '{':
-                        if (QuoteMode)
-                        {
+                        if (QuoteMode) {
                             Token.Append(aJSON[i]);
                             break;
                         }
                         stack.Push(new JSONObject());
-                        if (ctx != null)
-                        {
+                        if (ctx != null) {
                             ctx.Add(TokenName, stack.Peek());
                         }
                         TokenName = "";
@@ -603,15 +609,13 @@ namespace BeatmapInformation.SimpleJsons
                         break;
 
                     case '[':
-                        if (QuoteMode)
-                        {
+                        if (QuoteMode) {
                             Token.Append(aJSON[i]);
                             break;
                         }
 
                         stack.Push(new JSONArray());
-                        if (ctx != null)
-                        {
+                        if (ctx != null) {
                             ctx.Add(TokenName, stack.Peek());
                         }
                         TokenName = "";
@@ -621,28 +625,31 @@ namespace BeatmapInformation.SimpleJsons
 
                     case '}':
                     case ']':
-                        if (QuoteMode)
-                        {
+                        if (QuoteMode) {
 
                             Token.Append(aJSON[i]);
                             break;
                         }
-                        if (stack.Count == 0)
+                        if (stack.Count == 0) {
                             throw new Exception("JSON Parse: Too many closing brackets");
+                        }
 
                         stack.Pop();
-                        if (Token.Length > 0 || TokenIsQuoted)
+                        if (Token.Length > 0 || TokenIsQuoted) {
                             ctx.Add(TokenName, ParseElement(Token.ToString(), TokenIsQuoted));
+                        }
+
                         TokenIsQuoted = false;
                         TokenName = "";
                         Token.Length = 0;
-                        if (stack.Count > 0)
+                        if (stack.Count > 0) {
                             ctx = stack.Peek();
+                        }
+
                         break;
 
                     case ':':
-                        if (QuoteMode)
-                        {
+                        if (QuoteMode) {
                             Token.Append(aJSON[i]);
                             break;
                         }
@@ -657,13 +664,14 @@ namespace BeatmapInformation.SimpleJsons
                         break;
 
                     case ',':
-                        if (QuoteMode)
-                        {
+                        if (QuoteMode) {
                             Token.Append(aJSON[i]);
                             break;
                         }
-                        if (Token.Length > 0 || TokenIsQuoted)
+                        if (Token.Length > 0 || TokenIsQuoted) {
                             ctx.Add(TokenName, ParseElement(Token.ToString(), TokenIsQuoted));
+                        }
+
                         TokenIsQuoted = false;
                         TokenName = "";
                         Token.Length = 0;
@@ -676,17 +684,17 @@ namespace BeatmapInformation.SimpleJsons
 
                     case ' ':
                     case '\t':
-                        if (QuoteMode)
+                        if (QuoteMode) {
                             Token.Append(aJSON[i]);
+                        }
+
                         break;
 
                     case '\\':
                         ++i;
-                        if (QuoteMode)
-                        {
-                            char C = aJSON[i];
-                            switch (C)
-                            {
+                        if (QuoteMode) {
+                            var C = aJSON[i];
+                            switch (C) {
                                 case 't':
                                     Token.Append('\t');
                                     break;
@@ -702,9 +710,8 @@ namespace BeatmapInformation.SimpleJsons
                                 case 'f':
                                     Token.Append('\f');
                                     break;
-                                case 'u':
-                                    {
-                                        string s = aJSON.Substring(i + 1, 4);
+                                case 'u': {
+                                        var s = aJSON.Substring(i + 1, 4);
                                         Token.Append((char)int.Parse(
                                             s,
                                             System.Globalization.NumberStyles.AllowHexSpecifier));
@@ -724,12 +731,13 @@ namespace BeatmapInformation.SimpleJsons
                 }
                 ++i;
             }
-            if (QuoteMode)
-            {
+            if (QuoteMode) {
                 throw new Exception("JSON Parse: Quotation marks seems to be messed up.");
             }
-            if (ctx == null)
+            if (ctx == null) {
                 return ParseElement(Token.ToString(), TokenIsQuoted);
+            }
+
             return ctx;
         }
 
@@ -738,72 +746,81 @@ namespace BeatmapInformation.SimpleJsons
 
     public partial class JSONArray : JSONNode
     {
-        private List<JSONNode> m_List = new List<JSONNode>();
+        private readonly List<JSONNode> m_List = new List<JSONNode>();
         private bool inline = false;
         public override bool Inline
         {
-            get { return inline; }
-            set { inline = value; }
+            get => this.inline;
+            set => this.inline = value;
         }
 
-        public override JSONNodeType Tag { get { return JSONNodeType.Array; } }
-        public override bool IsArray { get { return true; } }
-        public override Enumerator GetEnumerator() { return new Enumerator(m_List.GetEnumerator()); }
+        public override JSONNodeType Tag => JSONNodeType.Array;
+        public override bool IsArray => true;
+        public override Enumerator GetEnumerator() { return new Enumerator(this.m_List.GetEnumerator()); }
 
         public override JSONNode this[int aIndex]
         {
             get
             {
-                if (aIndex < 0 || aIndex >= m_List.Count)
+                if (aIndex < 0 || aIndex >= this.m_List.Count) {
                     return new JSONLazyCreator(this);
-                return m_List[aIndex];
+                }
+
+                return this.m_List[aIndex];
             }
             set
             {
-                if (value == null)
+                if (value == null) {
                     value = JSONNull.CreateOrGet();
-                if (aIndex < 0 || aIndex >= m_List.Count)
-                    m_List.Add(value);
-                else
-                    m_List[aIndex] = value;
+                }
+
+                if (aIndex < 0 || aIndex >= this.m_List.Count) {
+                    this.m_List.Add(value);
+                }
+                else {
+                    this.m_List[aIndex] = value;
+                }
             }
         }
 
         public override JSONNode this[string aKey]
         {
-            get { return new JSONLazyCreator(this); }
+            get => new JSONLazyCreator(this);
             set
             {
-                if (value == null)
+                if (value == null) {
                     value = JSONNull.CreateOrGet();
-                m_List.Add(value);
+                }
+
+                this.m_List.Add(value);
             }
         }
 
-        public override int Count
-        {
-            get { return m_List.Count; }
-        }
+        public override int Count => this.m_List.Count;
 
         public override void Add(string aKey, JSONNode aItem)
         {
-            if (aItem == null)
+            if (aItem == null) {
                 aItem = JSONNull.CreateOrGet();
-            m_List.Add(aItem);
+            }
+
+            this.m_List.Add(aItem);
         }
 
         public override JSONNode Remove(int aIndex)
         {
-            if (aIndex < 0 || aIndex >= m_List.Count)
+            if (aIndex < 0 || aIndex >= this.m_List.Count) {
                 return null;
-            JSONNode tmp = m_List[aIndex];
-            m_List.RemoveAt(aIndex);
+            }
+
+            var tmp = this.m_List[aIndex];
+            this.m_List.RemoveAt(aIndex);
             return tmp;
         }
 
         public override JSONNode Remove(JSONNode aNode)
         {
-            m_List.Remove(aNode);
+            this.m_List.Remove(aNode);
             return aNode;
         }
 
@@ -811,8 +828,9 @@ namespace BeatmapInformation.SimpleJsons
         {
             get
             {
-                foreach (JSONNode N in m_List)
+                foreach (var N in this.m_List) {
                     yield return N;
+                }
             }
         }
 
@@ -820,22 +838,30 @@ namespace BeatmapInformation.SimpleJsons
         internal override void WriteToStringBuilder(StringBuilder aSB, int aIndent, int aIndentInc, JSONTextMode aMode)
         {
             aSB.Append('[');
-            int count = m_List.Count;
-            if (inline)
+            var count = this.m_List.Count;
+            if (this.inline) {
                 aMode = JSONTextMode.Compact;
-            for (int i = 0; i < count; i++)
-            {
-                if (i > 0)
-                    aSB.Append(',');
-                if (aMode == JSONTextMode.Indent)
-                    aSB.AppendLine();
-
-                if (aMode == JSONTextMode.Indent)
-                    aSB.Append(' ', aIndent + aIndentInc);
-                m_List[i].WriteToStringBuilder(aSB, aIndent + aIndentInc, aIndentInc, aMode);
             }
-            if (aMode == JSONTextMode.Indent)
+
+            for (var i = 0; i < count; i++) {
+                if (i > 0) {
+                    aSB.Append(',');
+                }
+
+                if (aMode == JSONTextMode.Indent) {
+                    aSB.AppendLine();
+                }
+
+                if (aMode == JSONTextMode.Indent) {
+                    aSB.Append(' ', aIndent + aIndentInc);
+                }
+
+                this.m_List[i].WriteToStringBuilder(aSB, aIndent + aIndentInc, aIndentInc, aMode);
+            }
+            if (aMode == JSONTextMode.Indent) {
                 aSB.AppendLine().Append(' ', aIndent);
+            }
+
             aSB.Append(']');
         }
     }
@@ -843,38 +869,44 @@ namespace BeatmapInformation.SimpleJsons
 
     public partial class JSONObject : JSONNode
     {
-        private Dictionary<string, JSONNode> m_Dict = new Dictionary<string, JSONNode>();
+        private readonly Dictionary<string, JSONNode> m_Dict = new Dictionary<string, JSONNode>();
 
         private bool inline = false;
         public override bool Inline
         {
-            get { return inline; }
-            set { inline = value; }
+            get => this.inline;
+            set => this.inline = value;
         }
 
-        public override JSONNodeType Tag { get { return JSONNodeType.Object; } }
-        public override bool IsObject { get { return true; } }
+        public override JSONNodeType Tag => JSONNodeType.Object;
+        public override bool IsObject => true;
 
-        public override Enumerator GetEnumerator() { return new Enumerator(m_Dict.GetEnumerator()); }
+        public override Enumerator GetEnumerator() { return new Enumerator(this.m_Dict.GetEnumerator()); }
 
 
         public override JSONNode this[string aKey]
         {
             get
             {
-                if (m_Dict.ContainsKey(aKey))
-                    return m_Dict[aKey];
-                else
+                if (this.m_Dict.ContainsKey(aKey)) {
+                    return this.m_Dict[aKey];
+                }
+                else {
                     return new JSONLazyCreator(this, aKey);
+                }
             }
             set
             {
-                if (value == null)
+                if (value == null) {
                     value = JSONNull.CreateOrGet();
-                if (m_Dict.ContainsKey(aKey))
-                    m_Dict[aKey] = value;
-                else
-                    m_Dict.Add(aKey, value);
+                }
+
+                if (this.m_Dict.ContainsKey(aKey)) {
+                    this.m_Dict[aKey] = value;
+                }
+                else {
+                    this.m_Dict.Add(aKey, value);
+                }
             }
         }
 
@@ -882,70 +914,78 @@ namespace BeatmapInformation.SimpleJsons
         {
             get
             {
-                if (aIndex < 0 || aIndex >= m_Dict.Count)
+                if (aIndex < 0 || aIndex >= this.m_Dict.Count) {
                     return null;
-                return m_Dict.ElementAt(aIndex).Value;
+                }
+
+                return this.m_Dict.ElementAt(aIndex).Value;
             }
             set
             {
-                if (value == null)
+                if (value == null) {
                     value = JSONNull.CreateOrGet();
-                if (aIndex < 0 || aIndex >= m_Dict.Count)
+                }
+
+                if (aIndex < 0 || aIndex >= this.m_Dict.Count) {
                     return;
-                string key = m_Dict.ElementAt(aIndex).Key;
-                m_Dict[key] = value;
+                }
+
+                var key = this.m_Dict.ElementAt(aIndex).Key;
+                this.m_Dict[key] = value;
             }
         }
 
-        public override int Count
-        {
-            get { return m_Dict.Count; }
-        }
+        public override int Count => this.m_Dict.Count;
 
         public override void Add(string aKey, JSONNode aItem)
         {
-            if (aItem == null)
+            if (aItem == null) {
                 aItem = JSONNull.CreateOrGet();
-
-            if (!string.IsNullOrEmpty(aKey))
-            {
-                if (m_Dict.ContainsKey(aKey))
-                    m_Dict[aKey] = aItem;
-                else
-                    m_Dict.Add(aKey, aItem);
             }
-            else
-                m_Dict.Add(Guid.NewGuid().ToString(), aItem);
+
+            if (!string.IsNullOrEmpty(aKey)) {
+                if (this.m_Dict.ContainsKey(aKey)) {
+                    this.m_Dict[aKey] = aItem;
+                }
+                else {
+                    this.m_Dict.Add(aKey, aItem);
+                }
+            }
+            else {
+                this.m_Dict.Add(Guid.NewGuid().ToString(), aItem);
+            }
         }
 
         public override JSONNode Remove(string aKey)
         {
-            if (!m_Dict.ContainsKey(aKey))
+            if (!this.m_Dict.ContainsKey(aKey)) {
                 return null;
-            JSONNode tmp = m_Dict[aKey];
-            m_Dict.Remove(aKey);
+            }
+
+            var tmp = this.m_Dict[aKey];
+            this.m_Dict.Remove(aKey);
             return tmp;
         }
 
         public override JSONNode Remove(int aIndex)
         {
-            if (aIndex < 0 || aIndex >= m_Dict.Count)
+            if (aIndex < 0 || aIndex >= this.m_Dict.Count) {
                 return null;
-            var item = m_Dict.ElementAt(aIndex);
-            m_Dict.Remove(item.Key);
+            }
+
+            var item = this.m_Dict.ElementAt(aIndex);
+            this.m_Dict.Remove(item.Key);
             return item.Value;
         }
 
         public override JSONNode Remove(JSONNode aNode)
         {
-            try
-            {
-                var item = m_Dict.Where(k => k.Value == aNode).First();
-                m_Dict.Remove(item.Key);
+            try {
+                var item = this.m_Dict.Where(k => k.Value == aNode).First();
+                this.m_Dict.Remove(item.Key);
                 return aNode;
             }
-            catch
-            {
+            catch {
                 return null;
             }
         }
@@ -954,35 +994,48 @@ namespace BeatmapInformation.SimpleJsons
         {
             get
             {
-                foreach (KeyValuePair<string, JSONNode> N in m_Dict)
+                foreach (var N in this.m_Dict) {
                     yield return N.Value;
+                }
             }
         }
 
         internal override void WriteToStringBuilder(StringBuilder aSB, int aIndent, int aIndentInc, JSONTextMode aMode)
         {
             aSB.Append('{');
-            bool first = true;
-            if (inline)
+            var first = true;
+            if (this.inline) {
                 aMode = JSONTextMode.Compact;
-            foreach (var k in m_Dict)
-            {
-                if (!first)
+            }
+
+            foreach (var k in this.m_Dict) {
+                if (!first) {
                     aSB.Append(',');
+                }
+
                 first = false;
-                if (aMode == JSONTextMode.Indent)
+                if (aMode == JSONTextMode.Indent) {
                     aSB.AppendLine();
-                if (aMode == JSONTextMode.Indent)
+                }
+
+                if (aMode == JSONTextMode.Indent) {
                     aSB.Append(' ', aIndent + aIndentInc);
+                }
+
                 aSB.Append('\"').Append(Escape(k.Key)).Append('\"');
-                if (aMode == JSONTextMode.Compact)
+                if (aMode == JSONTextMode.Compact) {
                     aSB.Append(':');
-                else
+                }
+                else {
                     aSB.Append(" : ");
+                }
+
                 k.Value.WriteToStringBuilder(aSB, aIndent + aIndentInc, aIndentInc, aMode);
             }
-            if (aMode == JSONTextMode.Indent)
+            if (aMode == JSONTextMode.Indent) {
                 aSB.AppendLine().Append(' ', aIndent);
+            }
+
             aSB.Append('}');
         }
 
@@ -993,45 +1046,48 @@ namespace BeatmapInformation.SimpleJsons
     {
         private string m_Data;
 
-        public override JSONNodeType Tag { get { return JSONNodeType.String; } }
-        public override bool IsString { get { return true; } }
+        public override JSONNodeType Tag => JSONNodeType.String;
+        public override bool IsString => true;
 
         public override Enumerator GetEnumerator() { return new Enumerator(); }
 
 
         public override string Value
         {
-            get { return m_Data; }
-            set
-            {
-                m_Data = value;
-            }
+            get => this.m_Data;
+            set => this.m_Data = value;
         }
 
         public JSONString(string aData)
         {
-            m_Data = aData;
+            this.m_Data = aData;
         }
 
         internal override void WriteToStringBuilder(StringBuilder aSB, int aIndent, int aIndentInc, JSONTextMode aMode)
         {
-            aSB.Append('\"').Append(Escape(m_Data)).Append('\"');
+            aSB.Append('\"').Append(Escape(this.m_Data)).Append('\"');
         }
         public override bool Equals(object obj)
         {
-            if (base.Equals(obj))
+            if (base.Equals(obj)) {
                 return true;
-            string s = obj as string;
-            if (s != null)
-                return m_Data == s;
-            JSONString s2 = obj as JSONString;
-            if (s2 != null)
-                return m_Data == s2.m_Data;
+            }
+
+            var s = obj as string;
+            if (s != null) {
+                return this.m_Data == s;
+            }
+
+            var s2 = obj as JSONString;
+            if (s2 != null) {
+                return this.m_Data == s2.m_Data;
+            }
+
             return false;
         }
         public override int GetHashCode()
         {
-            return m_Data.GetHashCode();
+            return this.m_Data.GetHashCode();
         }
     }
     // End of JSONString
@@ -1040,45 +1096,45 @@ namespace BeatmapInformation.SimpleJsons
     {
         private double m_Data;
 
-        public override JSONNodeType Tag { get { return JSONNodeType.Number; } }
-        public override bool IsNumber { get { return true; } }
+        public override JSONNodeType Tag => JSONNodeType.Number;
+        public override bool IsNumber => true;
         public override Enumerator GetEnumerator() { return new Enumerator(); }
 
         public override string Value
         {
-            get { return m_Data.ToString(CultureInfo.InvariantCulture); }
+            get => this.m_Data.ToString(CultureInfo.InvariantCulture);
             set
             {
-                double v;
-                if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out v))
-                    m_Data = v;
+                if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var v)) {
+                    this.m_Data = v;
+                }
             }
         }
 
         public override double AsDouble
         {
-            get { return m_Data; }
-            set { m_Data = value; }
+            get => this.m_Data;
+            set => this.m_Data = value;
         }
         public override long AsLong
         {
-            get { return (long)m_Data; }
-            set { m_Data = value; }
+            get => (long)this.m_Data;
+            set => this.m_Data = value;
         }
 
         public JSONNumber(double aData)
         {
-            m_Data = aData;
+            this.m_Data = aData;
         }
 
         public JSONNumber(string aData)
         {
-            Value = aData;
+            this.Value = aData;
         }
 
         internal override void WriteToStringBuilder(StringBuilder aSB, int aIndent, int aIndentInc, JSONTextMode aMode)
         {
-            aSB.Append(Value);
+            aSB.Append(this.Value);
         }
         private static bool IsNumeric(object value)
         {
@@ -1091,20 +1147,28 @@ namespace BeatmapInformation.SimpleJsons
         }
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj == null) {
                 return false;
-            if (base.Equals(obj))
+            }
+
+            if (base.Equals(obj)) {
                 return true;
-            JSONNumber s2 = obj as JSONNumber;
-            if (s2 != null)
-                return m_Data == s2.m_Data;
-            if (IsNumeric(obj))
-                return Convert.ToDouble(obj) == m_Data;
+            }
+
+            var s2 = obj as JSONNumber;
+            if (s2 != null) {
+                return this.m_Data == s2.m_Data;
+            }
+
+            if (IsNumeric(obj)) {
+                return Convert.ToDouble(obj) == this.m_Data;
+            }
+
             return false;
         }
         public override int GetHashCode()
         {
-            return m_Data.GetHashCode();
+            return this.m_Data.GetHashCode();
         }
     }
     // End of JSONNumber
@@ -1113,86 +1177,94 @@ namespace BeatmapInformation.SimpleJsons
     {
         private bool m_Data;
 
-        public override JSONNodeType Tag { get { return JSONNodeType.Boolean; } }
-        public override bool IsBoolean { get { return true; } }
+        public override JSONNodeType Tag => JSONNodeType.Boolean;
+        public override bool IsBoolean => true;
         public override Enumerator GetEnumerator() { return new Enumerator(); }
 
         public override string Value
         {
-            get { return m_Data.ToString(); }
+            get => this.m_Data.ToString();
             set
             {
-                bool v;
-                if (bool.TryParse(value, out v))
-                    m_Data = v;
+                if (bool.TryParse(value, out var v)) {
+                    this.m_Data = v;
+                }
             }
         }
         public override bool AsBool
         {
-            get { return m_Data; }
-            set { m_Data = value; }
+            get => this.m_Data;
+            set => this.m_Data = value;
         }
 
         public JSONBool(bool aData)
         {
-            m_Data = aData;
+            this.m_Data = aData;
         }
 
         public JSONBool(string aData)
         {
-            Value = aData;
+            this.Value = aData;
         }
 
         internal override void WriteToStringBuilder(StringBuilder aSB, int aIndent, int aIndentInc, JSONTextMode aMode)
         {
-            aSB.Append((m_Data) ? "true" : "false");
+            aSB.Append((this.m_Data) ? "true" : "false");
         }
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj == null) {
                 return false;
-            if (obj is bool)
-                return m_Data == (bool)obj;
+            }
+
+            if (obj is bool) {
+                return this.m_Data == (bool)obj;
+            }
+
             return false;
         }
         public override int GetHashCode()
         {
-            return m_Data.GetHashCode();
+            return this.m_Data.GetHashCode();
         }
     }
     // End of JSONBool
 
     public partial class JSONNull : JSONNode
     {
-        static JSONNull m_StaticInstance = new JSONNull();
+        private static readonly JSONNull m_StaticInstance = new JSONNull();
         public static bool reuseSameInstance = true;
         public static JSONNull CreateOrGet()
         {
-            if (reuseSameInstance)
+            if (reuseSameInstance) {
                 return m_StaticInstance;
+            }
+
             return new JSONNull();
         }
         private JSONNull() { }
 
-        public override JSONNodeType Tag { get { return JSONNodeType.NullValue; } }
-        public override bool IsNull { get { return true; } }
+        public override JSONNodeType Tag => JSONNodeType.NullValue;
+        public override bool IsNull => true;
         public override Enumerator GetEnumerator() { return new Enumerator(); }
 
         public override string Value
         {
-            get { return "null"; }
+            get => "null";
             set { }
         }
         public override bool AsBool
         {
-            get { return false; }
+            get => false;
             set { }
         }
 
         public override bool Equals(object obj)
         {
-            if (object.ReferenceEquals(this, obj))
+            if (object.ReferenceEquals(this, obj)) {
                 return true;
+            }
+
             return (obj is JSONNull);
         }
         public override int GetHashCode()
@@ -1210,58 +1282,63 @@ namespace BeatmapInformation.SimpleJsons
     internal partial class JSONLazyCreator : JSONNode
     {
         private JSONNode m_Node = null;
-        private string m_Key = null;
-        public override JSONNodeType Tag { get { return JSONNodeType.None; } }
+        private readonly string m_Key = null;
+        public override JSONNodeType Tag => JSONNodeType.None;
         public override Enumerator GetEnumerator() { return new Enumerator(); }
 
         public JSONLazyCreator(JSONNode aNode)
         {
-            m_Node = aNode;
-            m_Key = null;
+            this.m_Node = aNode;
+            this.m_Key = null;
         }
 
         public JSONLazyCreator(JSONNode aNode, string aKey)
         {
-            m_Node = aNode;
-            m_Key = aKey;
+            this.m_Node = aNode;
+            this.m_Key = aKey;
         }
 
         private T Set<T>(T aVal) where T : JSONNode
         {
-            if (m_Key == null)
-                m_Node.Add(aVal);
-            else
-                m_Node.Add(m_Key, aVal);
-            m_Node = null; // Be GC friendly.
+            if (this.m_Key == null) {
+                this.m_Node.Add(aVal);
+            }
+            else {
+                this.m_Node.Add(this.m_Key, aVal);
+            }
+
+            this.m_Node = null; // Be GC friendly.
             return aVal;
         }
 
         public override JSONNode this[int aIndex]
         {
-            get { return new JSONLazyCreator(this); }
-            set { Set(new JSONArray()).Add(value); }
+            get => new JSONLazyCreator(this);
+            set => this.Set(new JSONArray()).Add(value);
         }
 
         public override JSONNode this[string aKey]
         {
-            get { return new JSONLazyCreator(this, aKey); }
-            set { Set(new JSONObject()).Add(aKey, value); }
+            get => new JSONLazyCreator(this, aKey);
+            set => this.Set(new JSONObject()).Add(aKey, value);
         }
 
         public override void Add(JSONNode aItem)
         {
-            Set(new JSONArray()).Add(aItem);
+            this.Set(new JSONArray()).Add(aItem);
         }
 
         public override void Add(string aKey, JSONNode aItem)
         {
-            Set(new JSONObject()).Add(aKey, aItem);
+            this.Set(new JSONObject()).Add(aKey, aItem);
         }
 
         public static bool operator ==(JSONLazyCreator a, object b)
         {
-            if (b == null)
+            if (b == null) {
                 return true;
+            }
+
             return System.Object.ReferenceEquals(a, b);
         }
 
@@ -1272,8 +1349,10 @@ namespace BeatmapInformation.SimpleJsons
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj == null) {
                 return true;
+            }
+
             return System.Object.ReferenceEquals(this, obj);
         }
 
@@ -1284,56 +1363,55 @@ namespace BeatmapInformation.SimpleJsons
 
         public override int AsInt
         {
-            get { Set(new JSONNumber(0)); return 0; }
-            set { Set(new JSONNumber(value)); }
+            get { this.Set(new JSONNumber(0)); return 0; }
+            set => this.Set(new JSONNumber(value));
         }
 
         public override float AsFloat
         {
-            get { Set(new JSONNumber(0.0f)); return 0.0f; }
-            set { Set(new JSONNumber(value)); }
+            get { this.Set(new JSONNumber(0.0f)); return 0.0f; }
+            set => this.Set(new JSONNumber(value));
         }
 
         public override double AsDouble
         {
-            get { Set(new JSONNumber(0.0)); return 0.0; }
-            set { Set(new JSONNumber(value)); }
+            get { this.Set(new JSONNumber(0.0)); return 0.0; }
+            set => this.Set(new JSONNumber(value));
         }
 
         public override long AsLong
         {
             get
             {
-                if (longAsString)
-                    Set(new JSONString("0"));
-                else
-                    Set(new JSONNumber(0.0));
+                if (longAsString) {
+                    this.Set(new JSONString("0"));
+                }
+                else {
+                    this.Set(new JSONNumber(0.0));
+                }
+
                 return 0L;
             }
             set
             {
-                if (longAsString)
-                    Set(new JSONString(value.ToString()));
-                else
-                    Set(new JSONNumber(value));
+                if (longAsString) {
+                    this.Set(new JSONString(value.ToString()));
+                }
+                else {
+                    this.Set(new JSONNumber(value));
+                }
             }
         }
 
         public override bool AsBool
         {
-            get { Set(new JSONBool(false)); return false; }
-            set { Set(new JSONBool(value)); }
+            get { this.Set(new JSONBool(false)); return false; }
+            set => this.Set(new JSONBool(value));
         }
 
-        public override JSONArray AsArray
-        {
-            get { return Set(new JSONArray()); }
-        }
+        public override JSONArray AsArray => this.Set(new JSONArray());
 
-        public override JSONObject AsObject
-        {
-            get { return Set(new JSONObject()); }
-        }
+        public override JSONObject AsObject => this.Set(new JSONObject());
         internal override void WriteToStringBuilder(StringBuilder aSB, int aIndent, int aIndentInc, JSONTextMode aMode)
         {
             aSB.Append("null");

@@ -31,9 +31,15 @@ namespace BeatmapInformation
         }
 
         [OnStart]
-        public void OnApplicationStart() => Log.Debug("OnApplicationStart");
+        public void OnApplicationStart()
+        {
+            Log.Debug("OnApplicationStart");
+        }
 
         [OnExit]
-        public void OnApplicationQuit() => Log.Debug("OnApplicationQuit");
+        public void OnApplicationQuit()
+        {
+            Log.Debug("OnApplicationQuit");
+        }
     }
 }

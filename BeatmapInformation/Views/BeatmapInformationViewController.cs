@@ -574,7 +574,10 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        public void ResetView() => this.UpdateAllText(0, 0, 1, RankModel.Rank.SS);
+        public void ResetView()
+        {
+            this.UpdateAllText(0, 0, 1, RankModel.Rank.SSS);
+        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プライベートメソッド
@@ -582,18 +585,30 @@ namespace BeatmapInformation.Views
         /// コンボ数が変化したときに呼び出されます。
         /// </summary>
         /// <param name="obj"></param>
-        private void OnComboDidChangeEvent(int obj) => this.UpdateAllText(-1, obj);
+        private void OnComboDidChangeEvent(int obj)
+        {
+            this.UpdateAllText(-1, obj);
+        }
+
         /// <summary>
         /// スコアが変化したときに呼び出されます。
         /// </summary>
         /// <param name="arg1"></param>
         /// <param name="arg2"></param>
-        private void OnScoreDidChangeEvent(int arg1, int arg2) => this.UpdateAllText(arg2);
+        private void OnScoreDidChangeEvent(int arg1, int arg2)
+        {
+            this.UpdateAllText(arg2);
+        }
+
         /// <summary>
         /// 精度が変わったときに呼び出されます。
         /// </summary>
-        private void OnRelativeScoreOrImmediateRankDidChangeEvent() => this.UpdateAllText(-1, -1, this._relativeScoreAndImmediateRankCounter.relativeScore, this._relativeScoreAndImmediateRankCounter.immediateRank);
-        private void UpdateAllText(int score = -1, int combo = -1, float seido = -1, RankModel.Rank rank = RankModel.Rank.SS)
+        private void OnRelativeScoreOrImmediateRankDidChangeEvent()
+        {
+            this.UpdateAllText(-1, -1, this._relativeScoreAndImmediateRankCounter.relativeScore, this._relativeScoreAndImmediateRankCounter.immediateRank);
+        }
+
+        private void UpdateAllText(int score = -1, int combo = -1, float seido = -1, RankModel.Rank rank = RankModel.Rank.SSS)
         {
 
             if (0 <= score && this._score < score) {
@@ -605,7 +620,7 @@ namespace BeatmapInformation.Views
             if (0 <= seido && this._seido != seido) {
                 this._seido = seido;
             }
-            if (this._rank != rank) {
+            if (rank != RankModel.Rank.SSS && this._rank != rank) {
                 this._rank = rank;
             }
             var entity = this._scoreContainer.Spawn();
@@ -724,7 +739,11 @@ namespace BeatmapInformation.Views
             this._songtimeRing.fillAmount = (time <= 0f || this._songLength == 0) ? 1 : Mathf.Floor(time) / this._songLength;
         }
 
-        private void OnUpdatedRawSpectums(AudioSpectrum obj) => this.UpdateAudioSpectroms(obj);
+        private void OnUpdatedRawSpectums(AudioSpectrum obj)
+        {
+            this.UpdateAudioSpectroms(obj);
+        }
+
         private void CreateSpctromImages()
         {
             this.baseAudioSpectumImage.raycastTarget = false;
@@ -812,7 +831,11 @@ namespace BeatmapInformation.Views
 
             this.ResetView();
         }
-        private void OnChanged(PluginConfig obj) => this.SetConfigValue(obj);
+        private void OnChanged(PluginConfig obj)
+        {
+            this.SetConfigValue(obj);
+        }
+
         private void SetConfigValue(PluginConfig p)
         {
             Logger.Debug("Update Config");
@@ -924,12 +947,18 @@ namespace BeatmapInformation.Views
                 PluginConfig.Instance.ScreenRotZ = rot.z;
             }
         }
-        private void OnHandleGrabbed(object sender, FloatingScreenHandleEventArgs e) => Logger.Debug($"Handle Grabbed");
+        private void OnHandleGrabbed(object sender, FloatingScreenHandleEventArgs e)
+        {
+            Logger.Debug($"Handle Grabbed");
+        }
 
-        private bool CheckUpdateTarget(string format) => (format.Contains(TextFormatter.SCORE)
-                || format.Contains(TextFormatter.COMBO)
-                || format.Contains(TextFormatter.SEIDO)
-                || format.Contains(TextFormatter.RANK));
+        private bool CheckUpdateTarget(string format)
+        {
+            return (format.Contains(TextFormatter.SCORE)
+|| format.Contains(TextFormatter.COMBO)
+|| format.Contains(TextFormatter.SEIDO)
+|| format.Contains(TextFormatter.RANK));
+        }
 
         /// <summary>
         /// プロパティへ値をセットし、Viewへ通知します
@@ -953,10 +982,13 @@ namespace BeatmapInformation.Views
         /// プロパティの変更があったときに呼び出されます。Viewへの通知をここでキャンセルできます。
         /// </summary>
         /// <param name="propertyName">呼び出されたプロパティ名</param>
-        private void OnPropertyChanged(string propertyName) => HMMainThreadDispatcher.instance?.Enqueue(() =>
-                                                             {
-                                                                 this.NotifyPropertyChanged(propertyName);
-                                                             });
+        private void OnPropertyChanged(string propertyName)
+        {
+            HMMainThreadDispatcher.instance?.Enqueue(() =>
+            {
+                this.NotifyPropertyChanged(propertyName);
+            });
+        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // メンバ変数
@@ -988,7 +1020,7 @@ namespace BeatmapInformation.Views
         private int _score;
         private int _combo;
         private float _seido;
-        private RankModel.Rank _rank;
+        private RankModel.Rank _rank = RankModel.Rank.SSS;
 
         private bool _isUpdateSongName = true;
         private bool _isUpdateSongSubName = true;
@@ -1012,7 +1044,7 @@ namespace BeatmapInformation.Views
                 this._relativeScoreAndImmediateRankCounter = relativeScoreAndImmediateRankCounter;
                 this._audioTimeSyncController = audioTimeSource;
                 this._gameplayCoreSceneSetupData = gameplayCoreSceneSetupData;
-                
+
                 this._audioSpectrum = audioSpectrum;
                 this._textFormatter = textFormatter;
                 this._pointer = inputModule.GetField<VRPointer, VRInputModule>("_vrPointer");
@@ -1035,12 +1067,12 @@ namespace BeatmapInformation.Views
                     return;
                 }
                 var hash = previewBeatmapLevel.levelID.Split('_').LastOrDefault();
-                var beatmap = await WebClient.GetAsync($"https://beatsaver.com/api/maps/hash/{hash.ToLower()}", CancellationToken.None);
+                var beatmap = await WebClient.GetAsync($"https://api.beatsaver.com/maps/hash/{hash.ToLower()}", CancellationToken.None);
                 if (!string.IsNullOrEmpty(beatmap?.ContentToString())) {
                     var json = JSON.Parse(beatmap.ContentToString());
                     textFormatter.SongKey = json["id"];
                 }
-                
+
                 this._songLength = Mathf.Floor(this._audioTimeSyncController.songEndTime);
                 this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
                 this._comboController.comboDidChangeEvent += this.OnComboDidChangeEvent;

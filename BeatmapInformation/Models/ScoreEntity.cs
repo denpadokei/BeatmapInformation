@@ -25,7 +25,10 @@ namespace BeatmapInformation.Models
         }
         public class Pool : MemoryPool<ScoreEntity>
         {
-            protected override void Reinitialize(ScoreEntity item) => item.Clear();
+            protected override void Reinitialize(ScoreEntity item)
+            {
+                item.Clear();
+            }
         }
     }
 }

@@ -30,7 +30,10 @@ namespace BeatmapInformation.Views
             base.OnDestroy();
         }
 
-        public void Initialize() => GameplaySetup.instance.AddTab("Beatmap Information", this.ResourceName, this);
+        public void Initialize()
+        {
+            GameplaySetup.instance.AddTab("Beatmap Information", this.ResourceName, this);
+        }
 
         [UIAction("reset-position")]
         private void ResetPositionAndRotation()

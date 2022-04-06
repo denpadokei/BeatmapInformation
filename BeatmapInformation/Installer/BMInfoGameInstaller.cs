@@ -1,7 +1,6 @@
 ﻿using BeatmapInformation.AudioSpectrums;
 using BeatmapInformation.Models;
 using BeatmapInformation.Views;
-using SiraUtil;
 using UnityEngine;
 using Zenject;
 

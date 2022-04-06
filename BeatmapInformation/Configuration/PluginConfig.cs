@@ -70,9 +70,11 @@ namespace BeatmapInformation.Configuration
         /// <summary>
         /// This is called whenever BSIPA reads the config from disk (including when file changes are detected).
         /// </summary>
-        public virtual void OnReload() =>
+        public virtual void OnReload()
+        {
             // Do stuff after config is read from disk.
             this.OnReloaded?.Invoke(this);
+        }
 
         /// <summary>
         /// Call this to force BSIPA to update the config file. This is also called by BSIPA if it detects the file was modified.
