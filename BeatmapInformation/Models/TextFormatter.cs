@@ -40,7 +40,7 @@ namespace BeatmapInformation.Models
                 .Replace(SCORE, $"{scores.Score:#,0}")
                 .Replace(COMBO, $"{scores.Combo}")
                 .Replace(DIFFICURITY, $"{this.Difficulty}")
-                .Replace(SEIDO, $"{scores.Seido * 100:0.00}")
+                .Replace(ACCURACY, $"{scores.Seido * 100:0.00}")
                 .Replace(RANK, scores.Rank)
                 .ToString();
         }
@@ -73,7 +73,7 @@ namespace BeatmapInformation.Models
         public const string SCORE = "%SCORE%";
         public const string COMBO = "%COMBO%";
         public const string DIFFICURITY = "%DIFFICURITY%";
-        public const string SEIDO = "%SEIDO%";
+        public const string ACCURACY = "%SEIDO%";
         public const string RANK = "%RANK%";
         public const string SONG_KEY = "%SONG_KEY%";
         #endregion

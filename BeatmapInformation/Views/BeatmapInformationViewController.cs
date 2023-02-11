@@ -956,7 +956,7 @@ namespace BeatmapInformation.Views
         {
             return (format.Contains(TextFormatter.SCORE)
 || format.Contains(TextFormatter.COMBO)
-|| format.Contains(TextFormatter.SEIDO)
+|| format.Contains(TextFormatter.ACCURACY)
 || format.Contains(TextFormatter.RANK));
         }
 
