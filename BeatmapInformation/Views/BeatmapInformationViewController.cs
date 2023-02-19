@@ -1,5 +1,4 @@
 ﻿using BeatmapInformation.AudioSpectrums;
-using BeatmapInformation.Configuration;
 using BeatmapInformation.Models;
 using BeatmapInformation.SimpleJsons;
 using BeatmapInformation.WebClients;
@@ -12,6 +11,7 @@ using SongCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -528,7 +528,7 @@ namespace BeatmapInformation.Views
         }
         private IEnumerator Start()
         {
-            if (!PluginConfig.Instance.Enable) {
+            if (!this._profile.Enable) {
                 yield break;
             }
             yield return new WaitWhile(() => this._informationScreen == null || !this._informationScreen);
@@ -560,7 +560,7 @@ namespace BeatmapInformation.Views
                 this._pauseController.didResumeEvent -= this.OnDidResumeEvent;
             }
             this._audioSpectrum.UpdatedRawSpectums -= this.OnUpdatedRawSpectums;
-            PluginConfig.Instance.OnReloaded -= this.OnChanged;
+            this._profile.PropertyChanged -= this.OnProfile_PropertyChanged;
             if (this._informationScreen != null) {
                 this._informationScreen.HandleGrabbed -= this.OnHandleGrabbed;
                 this._informationScreen.HandleReleased -= this.OnHandleReleased;
@@ -577,6 +577,16 @@ namespace BeatmapInformation.Views
         public void ResetView()
         {
             this.UpdateAllText(0, 0, 1, RankModel.Rank.SSS);
+        }
+
+        public void SetProfile(ProfileEntity entity)
+        {
+            if (this._profile != null) {
+                this._profile.PropertyChanged -= this.OnProfile_PropertyChanged;
+            }
+            this._profile = entity;
+            this.SetConfigValue(entity);
+            this._profile.PropertyChanged += this.OnProfile_PropertyChanged;
         }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
@@ -628,31 +638,31 @@ namespace BeatmapInformation.Views
             HMMainThreadDispatcher.instance.Enqueue(() =>
             {
                 if (this._isUpdateSongName) {
-                    this.SongName = this._textFormatter.Convert(PluginConfig.Instance.SongNameFormat, entity);
+                    this.SongName = this._textFormatter.Convert(this._profile.SongNameFormat, entity);
                 }
                 if (this._isUpdateSongSubName) {
-                    this.SongSubName = this._textFormatter.Convert(PluginConfig.Instance.SongSubNameFormat, entity);
+                    this.SongSubName = this._textFormatter.Convert(this._profile.SongSubNameFormat, entity);
                 }
                 if (this._isUpdateSongKey) {
-                    this.SongKey = this._textFormatter.Convert(PluginConfig.Instance.SongKeyFormat, entity);
+                    this.SongKey = this._textFormatter.Convert(this._profile.SongKeyFormat, entity);
                 }
                 if (this._isUpdateSongAuthorName) {
-                    this.SongAuthor = this._textFormatter.Convert(PluginConfig.Instance.SongAuthorNameFormat, entity);
+                    this.SongAuthor = this._textFormatter.Convert(this._profile.SongAuthorNameFormat, entity);
                 }
                 if (this._isUpdateDifficurity) {
-                    this.Difficulity = this._textFormatter.Convert(PluginConfig.Instance.DifficurityFormat, entity);
+                    this.Difficulity = this._textFormatter.Convert(this._profile.DifficurityFormat, entity);
                 }
                 if (this._isUpdateCombo) {
-                    this.Combo = this._textFormatter.Convert(PluginConfig.Instance.ComboFormat, entity);
+                    this.Combo = this._textFormatter.Convert(this._profile.ComboFormat, entity);
                 }
                 if (this._isUpdateScore) {
-                    this.Score = this._textFormatter.Convert(PluginConfig.Instance.ScoreFormat, entity);
+                    this.Score = this._textFormatter.Convert(this._profile.ScoreFormat, entity);
                 }
                 if (this._isUpdateRank) {
-                    this.Rank = this._textFormatter.Convert(PluginConfig.Instance.RankFormat, entity);
+                    this.Rank = this._textFormatter.Convert(this._profile.RankFormat, entity);
                 }
                 if (this._isUpdateSeido) {
-                    this.Seido = this._textFormatter.Convert(PluginConfig.Instance.SeidoFormat, entity);
+                    this.Seido = this._textFormatter.Convert(this._profile.AccFormat, entity);
                 }
                 this._scoreContainer.Despawn(entity);
             });
@@ -666,8 +676,8 @@ namespace BeatmapInformation.Views
         {
             yield return new WaitWhile(() => this._cover == null || !this._cover);
             this._cover.sprite = beatmapCover;
-            if (PluginConfig.Instance.SongTimerVisible) {
-                this._cover.color = new Color(this._cover.color.r, this._cover.color.g, this._cover.color.b, PluginConfig.Instance.CoverAlpha);
+            if (this._profile.SongTimerVisible) {
+                this._cover.color = new Color(this._cover.color.r, this._cover.color.g, this._cover.color.b, this._profile.CoverAlpha);
             }
             this.CreateTimeCanvas();
         }
@@ -687,7 +697,7 @@ namespace BeatmapInformation.Views
                         canvas.sortingLayerName = energyCanvas.sortingLayerName;
                         this.SortinglayerOrder = energyCanvas.sortingOrder;
                         canvas.sortingOrder = this.SortinglayerOrder;
-                        canvas.gameObject.layer = PluginConfig.Instance.ScreenLayer;
+                        canvas.gameObject.layer = this._profile.ScreenLayer;
                     }
                     foreach (var graphic in this._informationScreen.GetComponentsInChildren<Graphic>()) {
                         graphic.raycastTarget = false;
@@ -723,12 +733,12 @@ namespace BeatmapInformation.Views
             this._songtimeRing.fillOrigin = 2;
             this._songtimeRing.fillAmount = 1;
             this._songtimeRing.fillMethod = Image.FillMethod.Radial360;
-            this._songtimeRing.transform.localScale = Vector3.one * PluginConfig.Instance.SontTimeRingScale;
+            this._songtimeRing.transform.localScale = Vector3.one * this._profile.SongTimeRingScale;
         }
 
         private void UpdateSongTime()
         {
-            if (!PluginConfig.Instance.SongTimerVisible) {
+            if (!this._profile.SongTimerVisible) {
                 return;
             }
             if (this._songtimeRing == null) {
@@ -755,7 +765,7 @@ namespace BeatmapInformation.Views
             spectromImage.type = Image.Type.Filled;
             spectromImage.fillMethod = Image.FillMethod.Vertical;
             spectromImage.sprite = Sprite.Create(new Texture2D(10, 100), new Rect(0, 0, 10, 100), Vector2.one / 2);
-            spectromImage.color = new Color(spectromImage.color.r, spectromImage.color.g, spectromImage.color.b, PluginConfig.Instance.AudioSpectrumAlpha);
+            spectromImage.color = new Color(spectromImage.color.r, spectromImage.color.g, spectromImage.color.b, this._profile.AudioSpectrumAlpha);
             spectromImage.fillAmount = 1f;
             var images = new List<ImageView>();
             foreach (var item in this._audioSpectrum.MeanLevels.Select((x, y) => y)) {
@@ -791,7 +801,7 @@ namespace BeatmapInformation.Views
         private void UpdateSpectumAlpha()
         {
             foreach (var image in this._spectroms) {
-                image.color = new Color(image.color.r, image.color.g, image.color.b, PluginConfig.Instance.AudioSpectrumAlpha);
+                image.color = new Color(image.color.r, image.color.g, image.color.b, this._profile.AudioSpectrumAlpha);
             }
         }
 
@@ -815,7 +825,7 @@ namespace BeatmapInformation.Views
             foreach (var canvas in this._informationScreen.GetComponentsInChildren<Canvas>()) {
                 canvas.sortingOrder = UI_SORTING_ORDER;
             }
-            if (PluginConfig.Instance.LockPosition) {
+            if (this._profile.LockPosition) {
                 return;
             }
             this._informationScreen.ShowHandle = true;
@@ -831,21 +841,22 @@ namespace BeatmapInformation.Views
 
             this.ResetView();
         }
-        private void OnChanged(PluginConfig obj)
+        private void OnChanged(ProfileEntity obj)
         {
             this.SetConfigValue(obj);
         }
 
-        private void SetConfigValue(PluginConfig p)
+        private void SetConfigValue(ProfileEntity p)
         {
             Logger.Debug("Update Config");
+
             this.CoverVisible = p.CoverVisible;
             this.CoverSize = p.CoverSize;
             this.CoverPivot = p.CoverPivotPos;
             this.SongtimeVisible = p.SongTimerVisible;
             if (this._songtimeRing) {
-                this._songtimeRing.transform.localScale = Vector3.one * PluginConfig.Instance.SontTimeRingScale;
-                this._cover.color = new Color(this._cover.color.r, this._cover.color.g, this._cover.color.b, PluginConfig.Instance.CoverAlpha);
+                this._songtimeRing.transform.localScale = Vector3.one * p.SongTimeRingScale;
+                this._cover.color = new Color(this._cover.color.r, this._cover.color.g, this._cover.color.b, p.CoverAlpha);
             }
             this.SongtimeTextFontSize = p.SongTimeTextFontSize;
 
@@ -865,8 +876,8 @@ namespace BeatmapInformation.Views
             this.ComboFontSize = p.ComboFontSize;
             this.ComboVisible = p.ComboVisible;
 
-            this.SeidoFontsize = p.SeidoFontSize;
-            this.SeidoVisible = p.SeidoVisible;
+            this.SeidoFontsize = p.AccFontSize;
+            this.SeidoVisible = p.AccVisible;
 
             this.RankVisible = p.RankVisible;
             this.RankFontsize = p.RankFontSize;
@@ -892,21 +903,22 @@ namespace BeatmapInformation.Views
 
             HMMainThreadDispatcher.instance.Enqueue(() =>
             {
-                this._audioSpectrum.Band = AudioSpectrum.ConvertToBandtype(p.BandType);
+                this._audioSpectrum.Band = p.BandType;
                 if (this._informationScreen == null || !this._informationScreen) {
                     return;
                 }
                 lock (_lockObject) {
+                    
                     this._informationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
                     this._informationScreen.transform.rotation = Quaternion.Euler(p.ScreenRotX, p.ScreenRotY, p.ScreenRotZ);
                     this.UpdateScreenLayer(p.ScreenLayer);
                     this.RebuildAudioSpectroms();
                     this.UpdateSpectumAlpha();
-                    var canvas = this._informationScreen.gameObject.GetComponentInChildren<Canvas>();
-                    var setting = this._curvedCanvasSettingsHelper.GetCurvedCanvasSettings(canvas);
+                    var canvas2 = this._informationScreen.gameObject.GetComponentInChildren<Canvas>();
+                    var setting = this._curvedCanvasSettingsHelper.GetCurvedCanvasSettings(canvas2);
                     setting?.SetRadius(p.ScreenRadius);
-                    if (!PluginConfig.Instance.OverlayMode && PluginConfig.Instance.ChangeScale) {
-                        this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
+                    if (!p.OverlayMode && p.ChangeScale) {
+                        this._informationScreen.transform.localScale = Vector3.one * p.ScreenScale;
                     }
                 }
 
@@ -927,7 +939,7 @@ namespace BeatmapInformation.Views
                 this._isUpdateDifficurity = this.CheckUpdateTarget(p.DifficurityFormat);
                 this._isUpdateScore = this.CheckUpdateTarget(p.ScoreFormat);
                 this._isUpdateCombo = this.CheckUpdateTarget(p.ComboFormat);
-                this._isUpdateSeido = this.CheckUpdateTarget(p.SeidoFormat);
+                this._isUpdateSeido = this.CheckUpdateTarget(p.AccFormat);
                 this._isUpdateRank = this.CheckUpdateTarget(p.RankFormat);
             });
         }
@@ -936,15 +948,15 @@ namespace BeatmapInformation.Views
         {
             Logger.Debug($"Handle Released");
             lock (_lockObject) {
-                PluginConfig.Instance.ScreenPosX = e.Position.x;
-                PluginConfig.Instance.ScreenPosY = e.Position.y;
-                PluginConfig.Instance.ScreenPosZ = e.Position.z;
+                this._profile.ScreenPosX = e.Position.x;
+                this._profile.ScreenPosY = e.Position.y;
+                this._profile.ScreenPosZ = e.Position.z;
 
                 var rot = e.Rotation.eulerAngles;
 
-                PluginConfig.Instance.ScreenRotX = rot.x;
-                PluginConfig.Instance.ScreenRotY = rot.y;
-                PluginConfig.Instance.ScreenRotZ = rot.z;
+                this._profile.ScreenRotX = rot.x;
+                this._profile.ScreenRotY = rot.y;
+                this._profile.ScreenRotZ = rot.z;
             }
         }
         private void OnHandleGrabbed(object sender, FloatingScreenHandleEventArgs e)
@@ -989,6 +1001,13 @@ namespace BeatmapInformation.Views
                 this.NotifyPropertyChanged(propertyName);
             });
         }
+
+        private void OnProfile_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender is ProfileEntity entity) {
+                this.OnChanged(entity);
+            }
+        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // メンバ変数
@@ -1016,6 +1035,8 @@ namespace BeatmapInformation.Views
         private static readonly object _lockObject = new object();
         private int SortinglayerOrder;
         public const int UI_SORTING_ORDER = 31;
+        /// <summary>プロファイル を取得、設定</summary>
+        private ProfileEntity _profile;
 
         private int _score;
         private int _combo;
@@ -1053,12 +1074,7 @@ namespace BeatmapInformation.Views
 
                 this._pauseController = container.TryResolve<PauseController>();
 
-
-                if (!PluginConfig.Instance.Enable) {
-                    return;
-                }
-                var band = AudioSpectrum.ConvertToBandtype(PluginConfig.Instance.BandType);
-                this._audioSpectrum.Band = band;
+                this._audioSpectrum.Band = AudioSpectrum.BandType.ThirtyOneBand;
                 this._audioSpectrum.UpdatedRawSpectums += this.OnUpdatedRawSpectums;
                 var diff = this._gameplayCoreSceneSetupData.difficultyBeatmap;
                 var previewBeatmapLevel = Loader.GetLevelById(diff.level.levelID);
@@ -1083,25 +1099,24 @@ namespace BeatmapInformation.Views
                 }
                 this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(CancellationToken.None);
 
-                this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(PluginConfig.Instance.ScreenPosX, PluginConfig.Instance.ScreenPosY, PluginConfig.Instance.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f), PluginConfig.Instance.ScreenRadius);
+                this._informationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(0, 0, 0), Quaternion.Euler(0f, 0f, 0f), 0);
                 this._informationScreen.SetRootViewController(this, HMUI.ViewController.AnimationType.None);
                 var canvas = this._informationScreen.GetComponentsInChildren<Canvas>(true).FirstOrDefault();
-                if (PluginConfig.Instance.OverlayMode) {
-                    canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                    this._informationScreen.transform.localScale = Vector3.one;
-                }
-                else {
-                    canvas.renderMode = RenderMode.WorldSpace;
-                }
-                this._informationScreen.transform.rotation = Quaternion.Euler(PluginConfig.Instance.ScreenRotX, PluginConfig.Instance.ScreenRotY, PluginConfig.Instance.ScreenRotZ);
-                if (PluginConfig.Instance.ChangeScale) {
-                    this._informationScreen.transform.localScale = Vector3.one * PluginConfig.Instance.ScreenScale;
-                }
+                //if (false) {
+                //    canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                //    this._informationScreen.transform.localScale = Vector3.one;
+                //}
+                //else {
+                //    canvas.renderMode = RenderMode.WorldSpace;
+                //}
+                canvas.renderMode = RenderMode.WorldSpace;
+                this._informationScreen.transform.rotation = Quaternion.Euler(0, 0, 0);
+                //if (false) {
+                //    this._informationScreen.transform.localScale = Vector3.one * p.ScreenScale;
+                //}
+
                 this._informationScreen.HandleGrabbed += this.OnHandleGrabbed;
                 this._informationScreen.HandleReleased += this.OnHandleReleased;
-
-                PluginConfig.Instance.OnReloaded += this.OnChanged;
-                this.SetConfigValue(PluginConfig.Instance);
             }
             catch (Exception e) {
                 Logger.Error(e);
