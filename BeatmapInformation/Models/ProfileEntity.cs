@@ -206,11 +206,12 @@ namespace BeatmapInformation.Models
 
         private void CopyFrom(ProfileEntity entity)
         {
-            foreach (var prop in typeof(ProfileEntity).GetProperties(BindingFlags.Public)) {
+            foreach (var prop in typeof(ProfileEntity).GetProperties(BindingFlags.Public | BindingFlags.Instance)) {
                 if (prop.Name == nameof(this.FilePath)) {
                     continue;
                 }
-                prop.SetValue(this, prop.GetValue(entity));
+                var value = prop.GetValue(entity);
+                prop.SetValue(this, value);
             }
         }
         #endregion
