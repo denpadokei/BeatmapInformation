@@ -7,6 +7,8 @@ SiraUtil
 BeatSaberMarkupLanguage  
 SongCore  
 # 設定項目一覧  
+プロファイルは「UserData\BeatmapInformation\Profile」に保存されます  
+
 [床に置くときの設定のサンプル](https://github.com/denpadokei/BeatmapInformation/releases/download/0.7.0/SettingJsonTemplate.zip)  
 [オーバーレイの設定のサンプル](https://github.com/denpadokei/BeatmapInformation/releases/download/1.1.0/BeatmapInformation_Config.zip)  
 |設定項目|値|説明|
