@@ -63,7 +63,7 @@ namespace BeatmapInformation.Configuration
         public virtual string DifficurityFormat { get; set; } = $"<color=#000000>{TextFormatter.DIFFICURITY}</color>";
         public virtual string ScoreFormat { get; set; } = TextFormatter.SCORE;
         public virtual string ComboFormat { get; set; } = $"{TextFormatter.COMBO} <size=50%>COMBO</size>";
-        public virtual string SeidoFormat { get; set; } = $"{TextFormatter.SEIDO} %";
+        public virtual string SeidoFormat { get; set; } = $"{TextFormatter.ACCURACY} %";
         public virtual string RankFormat { get; set; } = TextFormatter.RANK;
 
         public event Action<PluginConfig> OnReloaded;

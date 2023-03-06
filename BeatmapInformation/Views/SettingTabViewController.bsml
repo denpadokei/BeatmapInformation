@@ -1,7 +1,20 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
   <vertical>
-    <bool-setting text='Enable' value='enable' apply-on-change='true'></bool-setting>
-    <bool-setting text='Position lock' value='postion-lock' apply-on-change='true'></bool-setting>
-    <button text='Reset Position' on-click='reset-position'></button>
+    <page-button event-click="profiles-list#PageUp" direction='Up'></page-button>
+    <custom-list id='profiles-list' data='profiles' clickable-cells='false' preferred-width='120' preferred-height='60'>
+      <horizontal horizontal-fit ='Unconstrained' vertical-fit='Unconstrained'>
+        <vertical preferred-width='80'>
+          <text text='~profile-name' word-wrapping='false' align='Left'></text>
+        </vertical>
+        <vertical preferred-width='40'>
+          <horizontal>
+            <clickable-image id='lock-button' on-click='lock-click' preserve-aspect='true' preferred-height='7'></clickable-image>
+            <bool-setting text='' value='enable' apply-on-change='true'></bool-setting>
+          </horizontal>
+        </vertical>
+      </horizontal>
+    </custom-list>
+    <page-button event-click="profiles-list#PageDown" direction='Down'></page-button>
+    <button on-click='reload'></button>
   </vertical>
 </bg>

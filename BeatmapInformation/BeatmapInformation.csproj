@@ -60,6 +60,11 @@
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
     <Reference Include="SemVer">
       <HintPath>$(BeatSaberDir)\Libs\SemVer.dll</HintPath>
       <Private>False</Private>
@@ -158,9 +163,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioSpectrums\AudioSpectrum.cs" />
+    <Compile Include="Bases\NotificationObject.cs" />
+    <Compile Include="Installer\BMInfoAppInstaller.cs" />
     <Compile Include="Installer\BMInfoGameInstaller.cs" />
     <Compile Include="Installer\BMInfoMenuInstaller.cs" />
     <Compile Include="Logger.cs" />
+    <Compile Include="Models\LockIconLoader.cs" />
+    <Compile Include="Models\MultiViewManager.cs" />
+    <Compile Include="Models\ProfileEntity.cs" />
+    <Compile Include="Models\ProfileListEntity.cs" />
+    <Compile Include="Models\ProfileManager.cs" />
     <Compile Include="Models\ScoreEntity.cs" />
     <Compile Include="Models\TextFormatter.cs" />
     <Compile Include="Plugin.cs" />
@@ -183,7 +195,9 @@
     <EmbeddedResource Include="Views\SettingTabViewController.bsml">
       <DependentUpon>SettingTabViewController.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Template\BeatmapInformation.json" />
+    <None Include="Template\BeatmapInformation_flor.json" />
+    <None Include="Template\BeatmapInformation_overlay.json" />
+    <None Include="Template\Default.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
@@ -192,6 +206,11 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Icon\lock.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icon\unlock.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
