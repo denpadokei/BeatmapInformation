@@ -28,6 +28,7 @@ namespace BeatmapInformation
             Log.Debug("Config loaded");
             zenjector.Install<BMInfoGameInstaller>(Location.Player);
             zenjector.Install<BMInfoMenuInstaller>(Location.Menu);
+            zenjector.Install<BMInfoAppInstaller>(Location.App);
         }
 
         [OnStart]

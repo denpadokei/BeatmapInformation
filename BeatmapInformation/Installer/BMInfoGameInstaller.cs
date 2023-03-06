@@ -1,17 +1,14 @@
 ﻿using BeatmapInformation.AudioSpectrums;
 using BeatmapInformation.Models;
 using BeatmapInformation.Views;
-using BeatSaberMarkupLanguage;
 using HMUI;
-using System.Reflection;
+using IPA.Utilities;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using VRUIControls;
 using Zenject;
-using System.Collections.Generic;
-using UnityEngine.EventSystems;
-using IPA.Utilities;
-using static BeatmapInformation.Installer.BMInfoGameInstaller;
 
 namespace BeatmapInformation.Installer
 {
@@ -25,6 +22,12 @@ namespace BeatmapInformation.Installer
             {
             }
         }
+        /// <summary>
+        /// 複数のキャンバスを設定するときに使う
+        /// </summary>
+        /// <param name="binder"></param>
+        /// <param name="onInstantiated"></param>
+        /// <returns></returns>
         public static ScopeConcreteIdArgConditionCopyNonLazyBinder FromNewComponentAsViewControllerAsTransient(this FromBinder binder, Action<InjectContext, object> onInstantiated = null)
         {
             var go = new GameObject("ViewController");
@@ -41,7 +44,6 @@ namespace BeatmapInformation.Installer
             raycaster.enabled = false;
             componentBinding.OnInstantiated((ctx, obj) =>
             {
-                Logger.Info($"{obj}");
                 if (obj is ViewController vc) {
                     var newRaycaster = go.AddComponent<VRGraphicRaycaster>();
                     GameObject.Destroy(raycaster);
@@ -61,10 +63,10 @@ namespace BeatmapInformation.Installer
 
     public class BMInfoGameInstaller : MonoInstaller
     {
-        
+
         public override void InstallBindings()
         {
-            this.Container.BindInterfacesAndSelfTo<ProfileManager>().AsSingle().NonLazy();
+            this.Container.BindInterfacesAndSelfTo<MultiViewManager>().AsSingle().NonLazy();
             this.Container.BindInterfacesAndSelfTo<BeatmapInformationViewController>().FromNewComponentAsViewControllerAsTransient().AsTransient();
             this.Container.BindInterfacesAndSelfTo<AudioSpectrum>().FromNewComponentOn(new GameObject(nameof(AudioSpectrum))).AsCached();
             this.Container.BindInterfacesAndSelfTo<TextFormatter>().AsSingle();

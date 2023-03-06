@@ -1,6 +1,4 @@
-﻿using BeatmapInformation.Configuration;
-using BeatmapInformation.Views;
-using BeatSaberMarkupLanguage;
+﻿using BeatmapInformation.Views;
 using BeatSaberMarkupLanguage.FloatingScreen;
 using SiraUtil.Zenject;
 using System;
@@ -15,11 +13,11 @@ using Zenject;
 
 namespace BeatmapInformation.Models
 {
-    public class ProfileManager : IAsyncInitializable, IDisposable
+    public class ProfileManager : IInitializable
     {
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プロパティ
-        public ConcurrentDictionary<string, BeatmapInformationViewController> Profiles { get; private set; } = new ConcurrentDictionary<string, BeatmapInformationViewController>();
+        public ConcurrentDictionary<string, ProfileEntity> Profiles { get; private set; } = new ConcurrentDictionary<string, ProfileEntity>();
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // コマンド
@@ -32,19 +30,11 @@ namespace BeatmapInformation.Models
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        public void Dispose()
-        {
-            foreach (var view in this.Profiles.Values) {
-                GameObject.Destroy(view.gameObject);
-            }
-        }
 
-        public async Task InitializeAsync(CancellationToken token)
+        public void Initialize()
         {
-            foreach (var screen in this._screens) {
-                GameObject.Destroy(screen);
-            }
-            this._screens.Clear();
+            
+            this.Profiles.Clear();
             var files = Directory.EnumerateFiles(s_rootProfileDir, "*.json", SearchOption.TopDirectoryOnly);
             if (!files.Any()) {
                 var defaultProfile = new ProfileEntity();
@@ -57,21 +47,7 @@ namespace BeatmapInformation.Models
                 var profile = new ProfileEntity();
                 profile.Initialize(jsonFile);
                 profile.Load();
-                var view = _container.Resolve<BeatmapInformationViewController>();
-                view.InformationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(profile.ScreenPosX, profile.ScreenPosY, profile.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f), profile.ScreenRadius);
-                view.InformationScreen.SetRootViewController(view, HMUI.ViewController.AnimationType.None);
-                foreach (var canvas in view.InformationScreen.GetComponentsInChildren<Canvas>(true)) {
-                    if (profile.OverlayMode) {
-                        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                        view.transform.localScale = Vector3.one;
-                    }
-                    else {
-                        canvas.renderMode = RenderMode.WorldSpace;
-                    }
-                }
-                await view.InitializeAsync(token, profile);
-                view.gameObject.SetActive(true);
-                this.Profiles.AddOrUpdate(jsonFile, view, (s, p) => { GameObject.Destroy(p.gameObject); return view; });
+                this.Profiles.AddOrUpdate(jsonFile, profile, (s, p) => profile);
             }
         }
         #endregion
@@ -82,7 +58,6 @@ namespace BeatmapInformation.Models
         #region // メンバ変数
         private static readonly string s_rootProfileDir = Path.Combine(Environment.CurrentDirectory, "UserData", "BeatmapInformation", "Profile");
         private DiContainer _container;
-        private List<FloatingScreen> _screens = new List<FloatingScreen>();
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄

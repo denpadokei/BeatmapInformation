@@ -1,5 +1,4 @@
 ﻿using BeatmapInformation.AudioSpectrums;
-using BeatmapInformation.Configuration;
 using BeatmapInformation.Models;
 using BeatmapInformation.SimpleJsons;
 using BeatmapInformation.WebClients;
@@ -588,7 +587,6 @@ namespace BeatmapInformation.Views
             }
             this._profile = entity;
             this._profile.PropertyChanged += this.OnProfile_PropertyChanged;
-            Logger.Info($"hash:{this.GetInstanceID()}, path:{this._profile.FilePath}");
             this._audioSpectrum.UpdatedRawSpectums += this.OnUpdatedRawSpectums;
             this._scoreController.scoreDidChangeEvent += this.OnScoreDidChangeEvent;
             this._comboController.comboDidChangeEvent += this.OnComboDidChangeEvent;
@@ -605,7 +603,7 @@ namespace BeatmapInformation.Views
             }
             this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(token);
             HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
-            
+
             HMMainThreadDispatcher.instance.Enqueue(this.InitializeCorutinen());
             var hash = previewBeatmapLevel.levelID.Split('_').LastOrDefault();
             var beatmap = await WebClient.GetAsync($"https://api.beatsaver.com/maps/hash/{hash.ToLower()}", token);
