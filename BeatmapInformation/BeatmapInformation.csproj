@@ -195,7 +195,9 @@
     <EmbeddedResource Include="Views\SettingTabViewController.bsml">
       <DependentUpon>SettingTabViewController.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Template\BeatmapInformation.json" />
+    <None Include="Template\BeatmapInformation_flor.json" />
+    <None Include="Template\BeatmapInformation_overlay.json" />
+    <None Include="Template\Default.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
