@@ -195,9 +195,21 @@
     <EmbeddedResource Include="Views\SettingTabViewController.bsml">
       <DependentUpon>SettingTabViewController.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="Template\BeatmapInformation_flor.json" />
-    <None Include="Template\BeatmapInformation_overlay.json" />
-    <None Include="Template\Default.json" />
+    <None Include="Template\BeatmapInformation_flor.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Template\BeatmapInformation_overlay.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Template\Default.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <OutputCopy Include="$(OutputPath)BeatmapInformation.dll" OutputPath="Plugins\BeatmapInformation.dll" />
+    <OutputCopy Include="$(OutputPath)Template\BeatmapInformation_flor.json" OutputPath="UserData\BeatmapInformation\Profile\BeatmapInformation_flor.json" />
+    <OutputCopy Include="$(OutputPath)Template\BeatmapInformation_overlay.json" OutputPath="UserData\BeatmapInformation\Profile\BeatmapInformation_overlay.json" />
+    <OutputCopy Include="$(OutputPath)Template\Default.json" OutputPath="UserData\BeatmapInformation\Profile\Default.json" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="BeatSaberModdingTools.Tasks">
