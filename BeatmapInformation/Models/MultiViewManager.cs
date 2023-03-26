@@ -36,6 +36,7 @@ namespace BeatmapInformation.Models
                 }
                 var view = _diContainer.Resolve<BeatmapInformationViewController>();
                 view.InformationScreen = FloatingScreen.CreateFloatingScreen(new Vector2(200f, 120f), true, new Vector3(profile.ScreenPosX, profile.ScreenPosY, profile.ScreenPosZ), Quaternion.Euler(0f, 0f, 0f), profile.ScreenRadius);
+                view.InformationScreen.ShowHandle = false;
                 view.InformationScreen.SetRootViewController(view, HMUI.ViewController.AnimationType.None);
                 foreach (var canvas in view.InformationScreen.GetComponentsInChildren<Canvas>(true)) {
                     if (profile.OverlayMode) {

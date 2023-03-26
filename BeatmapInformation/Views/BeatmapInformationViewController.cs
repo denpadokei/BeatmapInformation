@@ -575,8 +575,9 @@ namespace BeatmapInformation.Views
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        public void ResetView()
+        public IEnumerator ResetView()
         {
+            yield return new WaitWhile(() => !this._initialized);
             this.UpdateAllText(0, 0, 1, RankModel.Rank.SSS);
         }
 
@@ -605,12 +606,9 @@ namespace BeatmapInformation.Views
             HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
 
             HMMainThreadDispatcher.instance.Enqueue(this.InitializeCorutinen());
+            
             var hash = previewBeatmapLevel.levelID.Split('_').LastOrDefault();
-            var beatmap = await WebClient.GetAsync($"https://api.beatsaver.com/maps/hash/{hash.ToLower()}", token);
-            if (!string.IsNullOrEmpty(beatmap?.ContentToString())) {
-                var json = JSON.Parse(beatmap.ContentToString());
-                this._textFormatter.SongKey = json["id"];
-            }
+            this._textFormatter.SongKey = await BSRKeyGetter.GetBSRKey(hash, token);
             this._initialized = true;
         }
         #endregion
@@ -862,8 +860,7 @@ namespace BeatmapInformation.Views
         {
             HMMainThreadDispatcher.instance.Enqueue(this.CanvasConfigUpdate());
             this.RebuildAudioSpectroms();
-
-            this.ResetView();
+            HMMainThreadDispatcher.instance.Enqueue(this.ResetView());
         }
         private void OnChanged(ProfileEntity obj)
         {
@@ -924,12 +921,11 @@ namespace BeatmapInformation.Views
             this.TextAncherMaxX = p.AncherMaxX;
             this.TextAncherMinY = p.AncherMinY;
             this.TextAncherMaxY = p.AncherMaxY;
-
-            HMMainThreadDispatcher.instance.Enqueue((Action)(() =>
+            IEnumerator update()
             {
                 this._audioSpectrum.Band = p.BandType;
                 if (this.InformationScreen == null || !this.InformationScreen) {
-                    return;
+                    yield break;
                 }
                 lock (_lockObject) {
                     this.InformationScreen.transform.position = new Vector3(p.ScreenPosX, p.ScreenPosY, p.ScreenPosZ);
@@ -944,7 +940,7 @@ namespace BeatmapInformation.Views
                         this.InformationScreen.transform.localScale = Vector3.one * p.ScreenScale;
                     }
                 }
-
+                yield return new WaitWhile(() => !this._initialized);
                 this._isUpdateSongName = true;
                 this._isUpdateSongSubName = true;
                 this._isUpdateSongKey = true;
@@ -954,7 +950,7 @@ namespace BeatmapInformation.Views
                 this._isUpdateCombo = true;
                 this._isUpdateSeido = true;
                 this._isUpdateRank = true;
-                this.ResetView();
+                yield return HMMainThreadDispatcher.instance.StartCoroutine(this.ResetView());
                 this._isUpdateSongName = this.CheckUpdateTarget(p.SongNameFormat);
                 this._isUpdateSongSubName = this.CheckUpdateTarget(p.SongSubNameFormat);
                 this._isUpdateSongKey = this.CheckUpdateTarget(p.SongKeyFormat);
@@ -964,7 +960,8 @@ namespace BeatmapInformation.Views
                 this._isUpdateCombo = this.CheckUpdateTarget(p.ComboFormat);
                 this._isUpdateSeido = this.CheckUpdateTarget(p.AccFormat);
                 this._isUpdateRank = this.CheckUpdateTarget(p.RankFormat);
-            }));
+            }
+            HMMainThreadDispatcher.instance.Enqueue(update());
         }
 
         private void OnHandleReleased(object sender, FloatingScreenHandleEventArgs e)
@@ -993,9 +990,9 @@ namespace BeatmapInformation.Views
         private bool CheckUpdateTarget(string format)
         {
             return (format.Contains(TextFormatter.SCORE)
-|| format.Contains(TextFormatter.COMBO)
-|| format.Contains(TextFormatter.ACCURACY)
-|| format.Contains(TextFormatter.RANK));
+                || format.Contains(TextFormatter.COMBO)
+                || format.Contains(TextFormatter.ACCURACY)
+                || format.Contains(TextFormatter.RANK));
         }
 
         private IEnumerator InitializeCorutinen()
