@@ -532,20 +532,20 @@ namespace BeatmapInformation.Views
         {
             yield return new WaitWhile(() => !this._initialized || this.InformationScreen == null || !this.InformationScreen);
             this.InformationScreen.ShowHandle = false;
-#if !DEBUG
-            // GameCore中のVRPointerはメニュー画面でのVRpointerと異なるのでもう一度セットしなおす必要がある。
-            // その他のMODとの干渉も考える
-            if (this.InformationScreen.screenMover?.gameObject.GetInstanceID() != this._pointer.gameObject.GetInstanceID()) {
-                var mover = this._pointer.gameObject.GetComponent<FloatingScreenMoverPointer>();
-                if (mover == null) {
-                    mover = this._pointer.gameObject.AddComponent<FloatingScreenMoverPointer>();
-                }
-                Destroy(this.InformationScreen.screenMover);
-                this.InformationScreen.screenMover = mover;
-                this.InformationScreen.screenMover.Init(this.InformationScreen);
-            }
-            this.InformationScreen.screenMover.enabled = false;
-#endif
+//#if !DEBUG
+//            // GameCore中のVRPointerはメニュー画面でのVRpointerと異なるのでもう一度セットしなおす必要がある。
+//            // その他のMODとの干渉も考える
+//            if (this.InformationScreen.screenMover?.gameObject.GetInstanceID() != this._pointer.gameObject.GetInstanceID()) {
+//                var mover = this._pointer.gameObject.GetComponent<FloatingScreenMoverPointer>();
+//                if (mover == null) {
+//                    mover = this._pointer.gameObject.AddComponent<FloatingScreenMoverPointer>();
+//                }
+//                Destroy(this.InformationScreen.screenMover);
+//                this.InformationScreen.screenMover = mover;
+//                this.InformationScreen.screenMover.Init(this.InformationScreen);
+//            }
+//            this.InformationScreen.screenMover.enabled = false;
+//#endif
         }
 
         protected override void OnDestroy()
@@ -603,9 +603,9 @@ namespace BeatmapInformation.Views
                 return;
             }
             this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(token);
-            HMMainThreadDispatcher.instance.Enqueue(this.SetCover(this._coverSprite));
+            MainThreadInvoker.Instance.Enqueue(this.SetCover(this._coverSprite));
 
-            HMMainThreadDispatcher.instance.Enqueue(this.InitializeCorutinen());
+            MainThreadInvoker.Instance.Enqueue(this.InitializeCorutinen());
             
             var hash = previewBeatmapLevel.levelID.Split('_').LastOrDefault();
             this._textFormatter.SongKey = await BSRKeyGetter.GetBSRKey(hash, token);
@@ -658,7 +658,7 @@ namespace BeatmapInformation.Views
             }
             var entity = this._scoreContainer.Spawn();
             entity.Set(this._score, this._combo, this._seido, this._rank);
-            HMMainThreadDispatcher.instance.Enqueue(() =>
+            MainThreadInvoker.Instance.Enqueue(() =>
             {
                 if (this._isUpdateSongName) {
                     this.SongName = this._textFormatter.Convert(this._profile?.SongNameFormat, entity);
@@ -834,7 +834,7 @@ namespace BeatmapInformation.Views
                 return;
             }
             this.InformationScreen.ShowHandle = false;
-            this.InformationScreen.screenMover.enabled = false;
+            //this.InformationScreen.screenMover.enabled = false;
             foreach (var canvas in this.InformationScreen.GetComponentsInChildren<Canvas>()) {
                 canvas.sortingOrder = this.SortinglayerOrder;
             }
@@ -852,15 +852,15 @@ namespace BeatmapInformation.Views
                 return;
             }
             this.InformationScreen.ShowHandle = true;
-            this.InformationScreen.screenMover.enabled = true;
+            //this.InformationScreen.screenMover.enabled = true;
         }
 
         [UIAction("#post-parse")]
         private void PostParse()
         {
-            HMMainThreadDispatcher.instance.Enqueue(this.CanvasConfigUpdate());
+            MainThreadInvoker.Instance.Enqueue(this.CanvasConfigUpdate());
             this.RebuildAudioSpectroms();
-            HMMainThreadDispatcher.instance.Enqueue(this.ResetView());
+            MainThreadInvoker.Instance.Enqueue(this.ResetView());
         }
         private void OnChanged(ProfileEntity obj)
         {
@@ -950,7 +950,7 @@ namespace BeatmapInformation.Views
                 this._isUpdateCombo = true;
                 this._isUpdateSeido = true;
                 this._isUpdateRank = true;
-                yield return HMMainThreadDispatcher.instance.StartCoroutine(this.ResetView());
+                yield return MainThreadInvoker.Instance.StartCoroutine(this.ResetView());
                 this._isUpdateSongName = this.CheckUpdateTarget(p.SongNameFormat);
                 this._isUpdateSongSubName = this.CheckUpdateTarget(p.SongSubNameFormat);
                 this._isUpdateSongKey = this.CheckUpdateTarget(p.SongKeyFormat);
@@ -961,7 +961,7 @@ namespace BeatmapInformation.Views
                 this._isUpdateSeido = this.CheckUpdateTarget(p.AccFormat);
                 this._isUpdateRank = this.CheckUpdateTarget(p.RankFormat);
             }
-            HMMainThreadDispatcher.instance.Enqueue(update());
+            MainThreadInvoker.Instance.Enqueue(update());
         }
 
         private void OnHandleReleased(object sender, FloatingScreenHandleEventArgs e)
@@ -1034,7 +1034,7 @@ namespace BeatmapInformation.Views
         /// <param name="propertyName">呼び出されたプロパティ名</param>
         private void OnPropertyChanged(string propertyName)
         {
-            HMMainThreadDispatcher.instance?.Enqueue(() =>
+            MainThreadInvoker.Instance.Enqueue(() =>
             {
                 this.NotifyPropertyChanged(propertyName);
             });
