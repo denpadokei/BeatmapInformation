@@ -56,12 +56,12 @@ namespace BeatmapInformation.Models
         #region // 構築・破棄
         public TextFormatter(GameplayCoreSceneSetupData gameplayCoreSceneSetupData)
         {
-            var diff = gameplayCoreSceneSetupData.difficultyBeatmap;
-            this.SongName = diff.level.songName;
-            this.SongSubName = diff.level.songSubName;
-            this.SongAuthorName = diff.level.songAuthorName;
-            this.SongMapperName = diff.level.levelAuthorName;
-            this.Difficulty = diff.difficulty;
+            var beatmapLevel = gameplayCoreSceneSetupData.beatmapLevel;
+            this.SongName = beatmapLevel.songName;
+            this.SongSubName = beatmapLevel.songSubName;
+            this.SongAuthorName = beatmapLevel.songAuthorName;
+            this.SongMapperName = string.Join(",", beatmapLevel.allMappers);
+            this.Difficulty = gameplayCoreSceneSetupData.beatmapKey.difficulty;
         }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*

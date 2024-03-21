@@ -597,12 +597,12 @@ namespace BeatmapInformation.Views
                 this._pauseController.didResumeEvent += this.OnDidResumeEvent;
             }
 
-            var previewBeatmapLevel = Loader.GetLevelById(this._difficultyBeatmap.level.levelID);
+            var previewBeatmapLevel = Loader.GetLevelById(this._beatmapKey.levelId);
             if (previewBeatmapLevel == null) {
                 Logger.Debug("previewmap is null!");
                 return;
             }
-            this._coverSprite = await previewBeatmapLevel.GetCoverImageAsync(token);
+            this._coverSprite = await previewBeatmapLevel.previewMediaData.GetCoverSpriteAsync(token);
             MainThreadInvoker.Instance.Enqueue(this.SetCover(this._coverSprite));
 
             MainThreadInvoker.Instance.Enqueue(this.InitializeCorutinen());
@@ -1074,7 +1074,7 @@ namespace BeatmapInformation.Views
         public const int UI_SORTING_ORDER = 31;
         /// <summary>プロファイル を取得、設定</summary>
         private ProfileEntity _profile;
-        private IDifficultyBeatmap _difficultyBeatmap;
+        private BeatmapKey _beatmapKey;
 
         private int _score;
         private int _combo;
@@ -1127,7 +1127,7 @@ namespace BeatmapInformation.Views
                 this._pauseController = container.TryResolve<PauseController>();
 
                 this._audioSpectrum.Band = AudioSpectrum.BandType.ThirtyOneBand;
-                this._difficultyBeatmap = this._gameplayCoreSceneSetupData.difficultyBeatmap;
+                this._beatmapKey = this._gameplayCoreSceneSetupData.beatmapKey;
                 this._songLength = Mathf.Floor(this._audioTimeSyncController.songEndTime);
             }
             catch (Exception e) {
