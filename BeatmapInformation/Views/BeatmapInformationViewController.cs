@@ -602,7 +602,7 @@ namespace BeatmapInformation.Views
                 Logger.Debug("previewmap is null!");
                 return;
             }
-            this._coverSprite = await previewBeatmapLevel.previewMediaData.GetCoverSpriteAsync(token);
+            this._coverSprite = await previewBeatmapLevel.previewMediaData.GetCoverSpriteAsync();
             MainThreadInvoker.Instance.Enqueue(this.SetCover(this._coverSprite));
 
             MainThreadInvoker.Instance.Enqueue(this.InitializeCorutinen());
