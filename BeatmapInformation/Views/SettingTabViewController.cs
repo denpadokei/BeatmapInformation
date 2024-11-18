@@ -44,13 +44,13 @@ namespace BeatmapInformation.Views
 
         protected override void OnDestroy()
         {
-            GameplaySetup.instance.RemoveTab("Beatmap Information");
+            GameplaySetup.Instance.RemoveTab("Beatmap Information");
             base.OnDestroy();
         }
 
         public void Initialize()
         {
-            GameplaySetup.instance.AddTab("Beatmap Information", this.ResourceName, this);
+            GameplaySetup.Instance.AddTab("Beatmap Information", this.ResourceName, this);
         }
 
         [UIAction("#post-parse")]
@@ -87,7 +87,7 @@ namespace BeatmapInformation.Views
                 
                 this.Profiles.Add(entity);
             }
-            this._profileTableData.tableView.ReloadData();
+            this._profileTableData.TableView.ReloadData();
         }
 
         /// <summary>
