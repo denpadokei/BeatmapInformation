@@ -146,6 +146,11 @@ jobs:
           fi
 
           tag_sha=$(gh api "repos/$repo/commits/$tag" --jq .sha 2>/dev/null || true)
+          # gh はタグが無いときにエラー JSON を stdout に出すため、40 桁の SHA 以外は
+          # 「タグが存在しない」として扱う (そうしないと初回リリースが skip される)。
+          if ! [[ "$tag_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            tag_sha=""
+          fi
           if [ -n "$tag_sha" ] && [ "$tag_sha" != "$sha" ]; then
             echo "::warning::tag '$tag' points to $tag_sha but this run built $sha; skipping release."
             exit 0
