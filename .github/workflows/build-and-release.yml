@@ -14,6 +14,7 @@ on:
     tags:
       - 'v*'
       - '[0-9]*'
+      - '*-bs*'
     paths:
       - .github/workflows/build-and-release.yml
       - BeatmapInformation/**
@@ -43,10 +44,12 @@ jobs:
         run: |
           $manifest = Get-Content 'BeatmapInformation/manifest.json' -Raw | ConvertFrom-Json
 
+          # タグ名は過去のリリースと同じ <ModName>-<version>-bs<GameVersion> に揃える。
+          # 例: BeatmapInformation-1.2.3-bs1.40.8
           if ($env:GITHUB_REF -like 'refs/tags/*') {
             $tag = $env:GITHUB_REF_NAME
           } else {
-            $tag = 'v' + $manifest.version
+            $tag = '{0}-{1}-bs{2}' -f $manifest.id, $manifest.version, $manifest.gameVersion
           }
 
           "version=$($manifest.version)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
@@ -138,10 +141,12 @@ jobs:
             echo "::error::release asset '$zip' not found"; exit 1
           fi
 
+          version='${{ needs.build.outputs.version }}'
+
           # セマンティックバージョンのプレリリースは prerelease として作成し、
           # Latest バッジを通常リリースから奪わないようにする。
           pre=()
-          if [[ "$tag" =~ ^[vV]?[0-9]+\.[0-9]+\.[0-9]+- ]]; then
+          if [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+- ]]; then
             pre=(--prerelease --latest=false)
           fi
 
