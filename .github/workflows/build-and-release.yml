@@ -1,23 +1,26 @@
 name: Build and Release
 
+# リリース手順
+#   1. manifest の version / gameVersion を上げて既定ブランチへマージ
+#   2. <ModName>-<version>-bs<GameVersion> のタグを手動作成して push
+#      (例: git tag BeatmapInformation-1.2.3-bs1.40.8 && git push origin BeatmapInformation-1.2.3-bs1.40.8)
+#   3. タグ push がビルドを実行し、成果物を添付してリリース名をタグ名に揃える
 on:
-  # 手動実行はビルド確認のみ。リリースはタグ push か既定ブランチへの push で作る。
+  # 手動実行と PR はビルド検証のみ (リリースしない)
   workflow_dispatch:
   pull_request:
     paths:
       - .github/workflows/build-and-release.yml
-      - BeatmapInformation/**
+      - 'BeatmapInformation/**'
   push:
-    # 既定ブランチへの push では manifest の version から v<version> タグを作ってリリースする。
-    # タグ push ではそのタグのコミットをビルドして同じタグへ添付する。
+    # 既定ブランチへの push はビルド検証のみ
     branches: [master]
+    # リリースはこの形式のタグを手動 push したときだけ
     tags:
-      - 'v*'
-      - '[0-9]*'
       - '*-bs*'
     paths:
       - .github/workflows/build-and-release.yml
-      - BeatmapInformation/**
+      - 'BeatmapInformation/**'
 
 permissions:
   contents: read
@@ -44,12 +47,16 @@ jobs:
         run: |
           $manifest = Get-Content 'BeatmapInformation/manifest.json' -Raw | ConvertFrom-Json
 
-          # タグ名は過去のリリースと同じ <ModName>-<version>-bs<GameVersion> に揃える。
-          # 例: BeatmapInformation-1.2.3-bs1.40.8
+          # タグ名は過去のリリースと同じ <ModName>-<version>-bs<GameVersion>。
+          $expected = '{0}-{1}-bs{2}' -f $manifest.id, $manifest.version, $manifest.gameVersion
+
           if ($env:GITHUB_REF -like 'refs/tags/*') {
             $tag = $env:GITHUB_REF_NAME
+            if ($tag -ne $expected) {
+              throw "Tag '$tag' does not match the manifest ($expected). version / gameVersion を上げてからタグを作り直してください。"
+            }
           } else {
-            $tag = '{0}-{1}-bs{2}' -f $manifest.id, $manifest.version, $manifest.gameVersion
+            $tag = $expected
           }
 
           "version=$($manifest.version)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
@@ -57,11 +64,11 @@ jobs:
           "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "commit=$($env:GITHUB_SHA)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
-      # BeatMods から 1.40.8 の参照アセンブリと依存 MOD を取得する。
+      # BeatMods から参照アセンブリと依存 MOD を取得する。
       # このプロジェクトは依存を csproj の DependsOn ではなく manifest.json に持つため、
       # アクションが読む game-version と additional-dependencies を明示する。
-      # アクションは範囲内で最も低いバージョンを選ぶので、1.40.8 に対応した最小を指定する
-      # (BSIPA 4.3.5 は 1.40.8 非対応、4.3.6 が対応済み)。
+      # アクションは範囲内で最も低いバージョンを選ぶので、対象の GameVersion に
+      # 対応した最小を指定する (BSIPA 4.3.5 は 1.40.8 非対応、4.3.6 が対応済み)。
       - name: Set up Beat Saber
         uses: nicoco007/setup-beat-saber@v1
         with:
@@ -117,8 +124,8 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     needs: build
-    # 既定ブランチへの push (タグ作成) とタグ push のときだけリリースする。
-    if: startsWith(github.ref, 'refs/tags/') || (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    # 手動作成したリリースタグを push したときだけ実行する。
+    if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
     steps:
@@ -128,7 +135,7 @@ jobs:
           name: ${{ needs.build.outputs.zip-name }}
           path: release
 
-      - name: Publish GitHub release
+      - name: Attach artifact and align release name
         shell: bash
         run: |
           repo='${{ github.repository }}'
@@ -150,9 +157,8 @@ jobs:
             pre=(--prerelease --latest=false)
           fi
 
+          # タグは手動作成済みなので、そのコミットをビルドしたことを確認する。
           tag_sha=$(gh api "repos/$repo/commits/$tag" --jq .sha 2>/dev/null || true)
-          # gh はタグが無いときにエラー JSON を stdout に出すため、40 桁の SHA 以外は
-          # 「タグが存在しない」として扱う (そうしないと初回リリースが skip される)。
           if ! [[ "$tag_sha" =~ ^[0-9a-f]{40}$ ]]; then
             tag_sha=""
           fi
@@ -161,12 +167,11 @@ jobs:
             exit 0
           fi
 
+          # 既にリリースがあれば名前をタグ名に揃えて成果物を差し替える。
           if gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
             gh release edit "$tag" --repo "$repo" --title "$tag" "${pre[@]}"
-          elif [ -n "$tag_sha" ]; then
-            gh release create "$tag" --repo "$repo" --title "$tag" --notes "$notes" --verify-tag "${pre[@]}"
           else
-            gh release create "$tag" --repo "$repo" --title "$tag" --notes "$notes" --target "$sha" "${pre[@]}"
+            gh release create "$tag" --repo "$repo" --title "$tag" --notes "$notes" --verify-tag "${pre[@]}"
           fi
           gh release upload "$tag" "$zip" --repo "$repo" --clobber
         env:
