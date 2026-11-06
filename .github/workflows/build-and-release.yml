@@ -82,18 +82,26 @@ jobs:
             -p:LocalRefsDir="$env:BeatSaberDir" `
             -p:DisableCopyToPlugins=true
 
-      - name: Locate package
+      - name: Package release zip
         id: package
         shell: pwsh
         run: |
-          # BSMT の ZipRelease が bin\Release\zip\<AssemblyName>-<version>-bs<game>-<hash>.zip を作る。
-          $zip = Get-ChildItem '${{ github.workspace }}\BeatmapInformation\bin\Release' -Recurse -Filter *.zip -File |
+          # CI (GITHUB_ACTIONS) では BSMT が ZipRelease を無効化するため、
+          # BSMT が組み立てた Artifact ディレクトリを自分で zip にする。
+          $manifest = Get-Content 'BeatmapInformation/manifest.json' -Raw | ConvertFrom-Json
+          $artifact = Get-ChildItem '${{ github.workspace }}\BeatmapInformation\bin\Release' -Recurse -Directory -Filter Artifact -ErrorAction SilentlyContinue |
             Sort-Object LastWriteTime -Descending |
             Select-Object -First 1
-          if (-not $zip) { throw 'BeatSaberModdingTools did not produce a release zip under bin\Release.' }
-          "zip-path=$($zip.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "zip-name=$($zip.BaseName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          Write-Host "Package: $($zip.FullName)"
+          if (-not $artifact) { throw 'BeatSaberModdingTools did not produce an Artifact directory under bin\Release.' }
+
+          $name = '{0}-{1}-bs{2}' -f $manifest.id, $manifest.version, $manifest.gameVersion
+          $zip = Join-Path $env:RUNNER_TEMP "$name.zip"
+          Compress-Archive -Path (Join-Path $artifact.FullName '*') -DestinationPath $zip -Force
+
+          "zip-path=$zip" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "zip-name=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Package: $zip"
+          Get-ChildItem $artifact.FullName -Recurse -File | ForEach-Object { Write-Host "  " $_.FullName.Substring($artifact.FullName.Length + 1) }
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
